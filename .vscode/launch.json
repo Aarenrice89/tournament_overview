@@ -23,7 +23,7 @@
       "console": "integratedTerminal",
       "args": [
         "-A",
-        "yosemite_scraper",
+        "tournament_overview",
         "worker",
         "-l",
         "INFO",

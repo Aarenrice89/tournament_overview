@@ -1,0 +1,176 @@
+{% extends "tournaments/base.html" %}
+
+{% block title %}{% if object %}{{ object.name }}{% else %}Add tournament{% endif %}{% endblock %}
+
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-4 page-header ps-3">
+    <div>
+      <h1 class="h2 mb-1">{% if object %}{{ object.name }}{% else %}Add tournament{% endif %}</h1>
+      <p class="text-muted mb-0">{% if object %}Update tournament logistics and team readiness.{% else %}Enter the tournament details first; teams can be added after saving.{% endif %}</p>
+    </div>
+    <a class="btn btn-outline-secondary" href="{% url 'tournaments:list' %}">Back to overview</a>
+  </div>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <fieldset>
+      <legend>Tournament</legend>
+      <div class="row g-3">
+        <div class="col-12 required"><label class="form-label" for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>{{ form.name }}{{ form.name.errors }}</div>
+        <div class="col-md-6 required"><label class="form-label" for="{{ form.start_date.id_for_label }}">{{ form.start_date.label }}</label>{{ form.start_date }}{{ form.start_date.errors }}</div>
+        <div class="col-md-6"><label class="form-label" for="{{ form.end_date.id_for_label }}">{{ form.end_date.label }}</label>{{ form.end_date }}{{ form.end_date.errors }}</div>
+        <div class="col-12 required"><label class="form-label" for="{{ form.location.id_for_label }}">{{ form.location.label }}</label>{{ form.location }}{{ form.location.errors }}</div>
+        <div class="col-md-6"><label class="form-label" for="{{ form.organizing_company.id_for_label }}">{{ form.organizing_company.label }}</label>{{ form.organizing_company }}{{ form.organizing_company.errors }}</div>
+        <div class="col-md-3 required"><label class="form-label" for="{{ form.cost_per_team.id_for_label }}">{{ form.cost_per_team.label }}</label>{{ form.cost_per_team }}{{ form.cost_per_team.errors }}</div>
+        <div class="col-md-3 required"><label class="form-label" for="{{ form.team_minimum.id_for_label }}">{{ form.team_minimum.label }}</label>{{ form.team_minimum }}{{ form.team_minimum.errors }}</div>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>Registration</legend>
+      <div class="row g-3">
+        <div class="col-md-6"><label class="form-label" for="{{ form.registration_opens_date.id_for_label }}">{{ form.registration_opens_date.label }}</label>{{ form.registration_opens_date }}{{ form.registration_opens_date.errors }}</div>
+        <div class="col-md-6"><label class="form-label" for="{{ form.registration_closes_date.id_for_label }}">{{ form.registration_closes_date.label }}</label>{{ form.registration_closes_date }}{{ form.registration_closes_date.errors }}</div>
+        <div class="col-12"><label class="form-label" for="{{ form.registration_link.id_for_label }}">{{ form.registration_link.label }}</label>{{ form.registration_link }}{{ form.registration_link.errors }}</div>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>Stay to play and hotel</legend>
+      <div class="row g-3">
+        <div class="col-md-3 form-check ms-3">{{ form.stay_to_play }}<label class="form-check-label" for="{{ form.stay_to_play.id_for_label }}">{{ form.stay_to_play.label }}</label>{{ form.stay_to_play.errors }}</div>
+        <div class="col-md-9"><label class="form-label" for="{{ form.stay_to_play_link.id_for_label }}">{{ form.stay_to_play_link.label }}</label>{{ form.stay_to_play_link }}{{ form.stay_to_play_link.errors }}</div>
+        <div class="col-12"><label class="form-label" for="{{ form.stay_to_play_notes.id_for_label }}">{{ form.stay_to_play_notes.label }}</label>{{ form.stay_to_play_notes }}{{ form.stay_to_play_notes.errors }}</div>
+        <div class="col-md-6"><label class="form-label" for="{{ form.coach_hotel.id_for_label }}">{{ form.coach_hotel.label }}</label>{{ form.coach_hotel }}{{ form.coach_hotel.errors }}</div>
+        <div class="col-md-6"><label class="form-label" for="{{ form.hotel_location.id_for_label }}">{{ form.hotel_location.label }}</label>{{ form.hotel_location }}{{ form.hotel_location.errors }}</div>
+        <div class="col-md-6"><label class="form-label" for="{{ form.number_of_rooms.id_for_label }}">{{ form.number_of_rooms.label }}</label>{{ form.number_of_rooms }}{{ form.number_of_rooms.errors }}</div>
+        <div class="col-md-6"><label class="form-label" for="{{ form.cost_per_room.id_for_label }}">{{ form.cost_per_room.label }}</label>{{ form.cost_per_room }}{{ form.cost_per_room.errors }}</div>
+        <div class="col-12"><label class="form-label" for="{{ form.coaches_notes.id_for_label }}">{{ form.coaches_notes.label }}</label>{{ form.coaches_notes }}{{ form.coaches_notes.errors }}</div>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>Coach travel</legend>
+      <div class="row g-3">
+        <div class="col-md-4"><label class="form-label" for="{{ form.travel.id_for_label }}">{{ form.travel.label }}</label>{{ form.travel }}{{ form.travel.errors }}</div>
+        <div class="col-md-4"><label class="form-label" for="{{ form.flight_number.id_for_label }}">{{ form.flight_number.label }}</label>{{ form.flight_number }}{{ form.flight_number.errors }}</div>
+        <div class="col-md-4"><label class="form-label" for="{{ form.number_of_coaches.id_for_label }}">{{ form.number_of_coaches.label }}</label>{{ form.number_of_coaches }}{{ form.number_of_coaches.errors }}</div>
+        <div class="col-12"><label class="form-label" for="{{ form.travel_notes.id_for_label }}">{{ form.travel_notes.label }}</label>{{ form.travel_notes }}{{ form.travel_notes.errors }}</div>
+      </div>
+    </fieldset>
+    {% if object %}
+      <fieldset>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <legend class="mb-0">Registered teams</legend>
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-primary" type="button" id="add-registration">Add team</button>
+            <a class="btn btn-sm btn-outline-primary" href="{% url 'tournaments:team-create' %}">Add reusable team</a>
+          </div>
+        </div>
+        <div id="registration-formset">
+          {{ formset.management_form }}
+          {{ formset.non_form_errors }}
+          {% for registration_form in formset %}
+            <div class="border rounded p-3 mb-3 registration-form">
+              {{ registration_form.id }}
+              {% if registration_form.non_field_errors %}{{ registration_form.non_field_errors }}{% endif %}
+              <div class="row g-3 align-items-end">
+                <div class="col-md-4"><label class="form-label" for="{{ registration_form.team.id_for_label }}">Team</label>{{ registration_form.team }}{{ registration_form.team.errors }}</div>
+                <div class="col-md-2 form-check ms-3">{{ registration_form.is_registered }}<label class="form-check-label" for="{{ registration_form.is_registered.id_for_label }}">Registered</label>{{ registration_form.is_registered.errors }}</div>
+                <div class="col-md-2 form-check">{{ registration_form.is_paid }}<label class="form-check-label" for="{{ registration_form.is_paid.id_for_label }}">Paid</label>{{ registration_form.is_paid.errors }}</div>
+                <div class="col-md-2 form-check">{{ registration_form.rosters_entered }}<label class="form-check-label" for="{{ registration_form.rosters_entered.id_for_label }}">Rosters entered</label>{{ registration_form.rosters_entered.errors }}</div>
+                <div class="col-md-1 d-flex align-items-end">
+                  <span class="visually-hidden">{{ registration_form.DELETE }}</span>
+                  <button class="btn btn-sm btn-outline-danger" type="button" data-remove-registration title="Remove team" aria-label="Remove team">
+                    <svg aria-hidden="true" fill="currentColor" height="16" viewBox="0 0 16 16" width="16"><path d="M5.5 5.5A.5.5 0 0 1 6 5h4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0V6H6v6.5a.5.5 0 0 1-1 0z"/><path d="M14.5 3a1 1 0 0 1-1 1H13l-.8 9.2A2 2 0 0 1 10.2 15H5.8a2 2 0 0 1-2-1.8L3 4h-.5a1 1 0 1 1 0-2h3a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1h3a1 1 0 0 1 1 1M4 4l.8 9.1a1 1 0 0 0 1 .9h4.4a1 1 0 0 0 1-.9L12 4zM6.5 2a.5.5 0 0 0-.5.5V3h4v-.5a.5.5 0 0 0-.5-.5z"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+        <template id="empty-registration-form">
+          <div class="border rounded p-3 mb-3 registration-form">
+            {{ formset.empty_form.id }}
+            <div class="row g-3 align-items-end">
+              <div class="col-md-4"><label class="form-label" for="{{ formset.empty_form.team.id_for_label }}">Team</label>{{ formset.empty_form.team }}</div>
+              <div class="col-md-2 form-check ms-3">{{ formset.empty_form.is_registered }}<label class="form-check-label" for="{{ formset.empty_form.is_registered.id_for_label }}">Registered</label></div>
+              <div class="col-md-2 form-check">{{ formset.empty_form.is_paid }}<label class="form-check-label" for="{{ formset.empty_form.is_paid.id_for_label }}">Paid</label></div>
+              <div class="col-md-2 form-check">{{ formset.empty_form.rosters_entered }}<label class="form-check-label" for="{{ formset.empty_form.rosters_entered.id_for_label }}">Rosters entered</label></div>
+              <div class="col-md-1 d-flex align-items-end">
+                <span class="visually-hidden">{{ formset.empty_form.DELETE }}</span>
+                <button class="btn btn-sm btn-outline-danger" type="button" data-remove-registration title="Remove team" aria-label="Remove team">
+                  <svg aria-hidden="true" fill="currentColor" height="16" viewBox="0 0 16 16" width="16"><path d="M5.5 5.5A.5.5 0 0 1 6 5h4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0V6H6v6.5a.5.5 0 0 1-1 0z"/><path d="M14.5 3a1 1 0 0 1-1 1H13l-.8 9.2A2 2 0 0 1 10.2 15H5.8a2 2 0 0 1-2-1.8L3 4h-.5a1 1 0 1 1 0-2h3a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1h3a1 1 0 0 1 1 1M4 4l.8 9.1a1 1 0 0 0 1 .9h4.4a1 1 0 0 0 1-.9L12 4zM6.5 2a.5.5 0 0 0-.5.5V3h4v-.5a.5.5 0 0 0-.5-.5z"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </template>
+      </fieldset>
+    {% endif %}
+    <div class="d-flex gap-2">
+      <button class="btn btn-primary" type="submit">Save tournament</button>
+      {% if object %}<a class="btn btn-outline-danger" href="{% url 'tournaments:delete' object.pk %}">Remove tournament</a>{% endif %}
+    </div>
+  </form>
+  {% if object %}
+    <script>
+      const registrationFormset = document.getElementById("registration-formset");
+      const teamOptions = [...registrationFormset.querySelector('select[name$="-team"]').options].map((option) => ({
+        text: option.text,
+        value: option.value,
+      }));
+
+      function synchronizeTeamOptions() {
+        const registrationForms = [...registrationFormset.querySelectorAll(".registration-form")];
+        registrationForms.forEach((registrationForm) => {
+          registrationForm.hidden = registrationForm.querySelector('input[name$="-DELETE"]').checked;
+        });
+        const selectedTeams = new Set(
+          registrationForms
+            .filter((registrationForm) => !registrationForm.querySelector('input[name$="-DELETE"]').checked)
+            .map((registrationForm) => registrationForm.querySelector('select[name$="-team"]').value)
+            .filter(Boolean),
+        );
+
+        registrationForms.forEach((registrationForm) => {
+          const teamSelect = registrationForm.querySelector('select[name$="-team"]');
+          const selectedValue = teamSelect.value;
+
+          teamSelect.replaceChildren(...teamOptions.filter((option) => {
+            return !option.value || option.value === selectedValue || !selectedTeams.has(option.value);
+          }).map((option) => {
+            const teamOption = new Option(option.text, option.value, false, option.value === selectedValue);
+            return teamOption;
+          }));
+        });
+      }
+
+      document.getElementById("add-registration").addEventListener("click", () => {
+        const formset = document.getElementById("registration-formset");
+        const totalForms = document.getElementById("id_registrations-TOTAL_FORMS");
+        const formIndex = totalForms.value;
+        const formMarkup = document.getElementById("empty-registration-form").innerHTML.replaceAll("__prefix__", formIndex);
+
+        formset.insertAdjacentHTML("beforeend", formMarkup);
+        totalForms.value = Number(formIndex) + 1;
+        synchronizeTeamOptions();
+      });
+
+      registrationFormset.addEventListener("change", (event) => {
+        if (event.target.matches('select[name$="-team"], input[name$="-DELETE"]')) {
+          synchronizeTeamOptions();
+        }
+      });
+
+      registrationFormset.addEventListener("click", (event) => {
+        const removeButton = event.target.closest("[data-remove-registration]");
+        if (!removeButton) return;
+
+        const registrationForm = removeButton.closest(".registration-form");
+        registrationForm.querySelector('input[name$="-DELETE"]').checked = true;
+        synchronizeTeamOptions();
+      });
+
+      synchronizeTeamOptions();
+    </script>
+  {% endif %}
+{% endblock %}

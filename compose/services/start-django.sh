@@ -14,5 +14,5 @@ if [ "${WEBSERVER^^}" = "DJANGO" ]; then
     echo "WEBSERVER config set to DJANGO"
     python manage.py runserver 0.0.0.0:8080
 else
-    gunicorn --reload yosemite_scraper.wsgi
+    gunicorn --reload tournament_overview.wsgi
 fi

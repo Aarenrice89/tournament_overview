@@ -1,6 +1,6 @@
 version: "3.8"
 
-name: yosemite_scraper
+name: tournament_overview
 
 services:
   db:
@@ -32,7 +32,7 @@ services:
       - cache
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.api_${COMPOSE_PROJECT_NAME}_http.rule=Host(`api.yosemite-scraper.localhost`)"
+      - "traefik.http.routers.api_${COMPOSE_PROJECT_NAME}_http.rule=Host(`api.tournament-overview.localhost`)"
       - "traefik.http.routers.api_${COMPOSE_PROJECT_NAME}_http.tls=true"
       - "traefik.http.routers.api_${COMPOSE_PROJECT_NAME}_http.entrypoints=websecure"
       - "traefik.docker.network=proxy"
@@ -95,7 +95,7 @@ services:
   #     - 5555
   #   labels:
   #     - "traefik.enable=true"
-  #     - "traefik.http.routers.flower_${COMPOSE_PROJECT_NAME}_http.rule=Host(`flower.yosemite-scraper.localhost`)"
+  #     - "traefik.http.routers.flower_${COMPOSE_PROJECT_NAME}_http.rule=Host(`flower.tournament-overview.localhost`)"
   #     - "traefik.http.routers.flower_${COMPOSE_PROJECT_NAME}_http.tls=true"
   #     - "traefik.http.routers.flower_${COMPOSE_PROJECT_NAME}_http.entrypoints=websecure"
   #     - "traefik.docker.network=proxy"

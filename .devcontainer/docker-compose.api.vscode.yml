@@ -1,4 +1,4 @@
-name: yosemite_scraper_vscode
+name: tournament_overview_vscode
 services:
   api:
     env_file:

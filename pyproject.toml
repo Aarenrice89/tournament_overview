@@ -3,7 +3,6 @@ name = "tournament-overview"
 version = "0.1.0"
 description = ""
 authors = ["Aaren Rice"]
-package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.12"
@@ -41,8 +40,8 @@ profile = "black"
 extend-exclude = '''
 (
     ^/manage.py
-    | yosemite_scraper/wsgi.py
-    | yosemite_scraper/asgi.py
+    | tournament_overview/wsgi.py
+    | tournament_overview/asgi.py
     | migrations
 )
 '''

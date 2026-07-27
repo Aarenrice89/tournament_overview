@@ -39,4 +39,4 @@ args+=" $@"
 
 cd /app
 
-celery -A yosemite_scraper $service -l info $args
+celery -A tournament_overview $service -l info $args

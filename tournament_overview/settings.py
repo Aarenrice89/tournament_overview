@@ -45,6 +45,16 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # 3rd party apps
+    "django_extensions",
+    "rest_framework",
+    "corsheaders",
+    "drf_spectacular",
+    # "rest_framework_simplejwt.token_blacklist",
+    "django_celery_results",
+    "django_celery_beat",
+    # Custom apps
+    "tournaments",
 ]
 
 MIDDLEWARE = [
@@ -180,6 +190,13 @@ SIMPLE_JWT = {
 
 
 REST_FRAMEWORK["DEFAULT_SCHEMA_CLASS"] = "drf_spectacular.openapi.AutoSchema"
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Tournament Overview API",
+    "DESCRIPTION": "API documentation for volleyball tournament management.",
+    "VERSION": "1.0.0",
+}
+
 COOKIE_DOMAIN = env("COOKIE_DOMAIN")
 
 # https://docs.djangoproject.com/en/4.1/ref/csrf/
@@ -189,7 +206,8 @@ CSRF_TRUSTED_ORIGINS = env("CSRF_TRUSTED_ORIGINS", default=[])
 CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
 CORS_ALLOW_CREDENTIALS = True
 
-CSRF_TRUSTED_ORIGINS.extend(CORS_ALLOWED_ORIGINS)
+CSRF_TRUSTED_ORIGINS.extend(["https://api.tournament-overview.localhost"])
+# CSRF_TRUSTED_ORIGINS.extend(CORS_ALLOWED_ORIGINS)
 
 
 # Redis

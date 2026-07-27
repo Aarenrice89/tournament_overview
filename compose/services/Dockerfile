@@ -29,15 +29,9 @@ RUN poetry config virtualenvs.create false
 
 COPY pyproject.toml poetry.lock /app/
 
-ENV PLAYWRIGHT_BROWSERS_PATH=/opt/playwright/pw-browsers
-RUN mkdir -p "$PLAYWRIGHT_BROWSERS_PATH" && chmod 777 "$PLAYWRIGHT_BROWSERS_PATH"
-
 FROM app_base as development_image
 
-RUN poetry install
-
-RUN playwright install --with-deps chromium
-
+RUN poetry install --no-root
 COPY . .
 
 CMD ["bash", "./compose/services/start-django.sh"]

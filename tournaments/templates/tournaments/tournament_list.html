@@ -1,0 +1,102 @@
+{% extends "tournaments/base.html" %}
+
+{% block title %}Tournament Overview{% endblock %}
+
+{% block content %}
+  <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4 page-header ps-3">
+    <div>
+      <h1 class="h2 mb-1">Tournament overview</h1>
+      <p class="text-muted mb-0">Track registration, payment, and roster readiness in one place.</p>
+    </div>
+    <a class="btn btn-primary" href="{% url 'tournaments:create' %}">Add tournament</a>
+  </div>
+
+  <form class="row g-2 align-items-center mb-4" id="tournament-search-form" method="get">
+    {% if current_sort %}<input type="hidden" name="sort" value="{{ current_sort }}">{% endif %}
+    <div class="col-sm-6 col-md-5">
+      <label class="visually-hidden" for="tournament-search">Search tournaments</label>
+      <input class="form-control" id="tournament-search" name="q" placeholder="Search tournament name" type="search" value="{{ search_query }}">
+    </div>
+    <div class="col-auto"><button class="btn btn-outline-primary" type="submit">Search</button></div>
+    {% if search_query %}<div class="col-auto"><a class="btn btn-outline-secondary" href="{% url 'tournaments:list' %}{% if current_sort %}?sort={{ current_sort }}{% endif %}">Clear search</a></div>{% endif %}
+  </form>
+  <script>
+    const tournamentSearchForm = document.getElementById("tournament-search-form");
+    const tournamentSearchInput = document.getElementById("tournament-search");
+    let tournamentSearchTimer;
+
+    tournamentSearchInput.addEventListener("input", () => {
+      clearTimeout(tournamentSearchTimer);
+      tournamentSearchTimer = setTimeout(() => tournamentSearchForm.requestSubmit(), 300);
+    });
+
+    tournamentSearchForm.addEventListener("submit", () => clearTimeout(tournamentSearchTimer));
+  </script>
+
+  {% if tournaments %}
+    <div class="table-responsive bg-white rounded">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th scope="col">Tournament</th>
+            <th scope="col">
+              <a class="link-dark text-decoration-none" href="?{{ sort_query_prefix }}sort={{ date_sort }}">
+                Dates{% if current_sort == "date" %} &uarr;{% elif current_sort == "-date" %} &darr;{% endif %}
+              </a>
+            </th>
+            <th scope="col">
+              <a class="link-dark text-decoration-none" href="?{{ sort_query_prefix }}sort={{ registration_opens_sort }}">
+                Registration opens{% if current_sort == "registration_opens" %} &uarr;{% elif current_sort == "-registration_opens" %} &darr;{% endif %}
+              </a>
+            </th>
+            <th scope="col">Teams entered</th>
+            <th scope="col" class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for tournament in tournaments %}
+            <tr>
+              <td>
+                <a class="fw-semibold text-decoration-none" href="{% url 'tournaments:detail' tournament.pk %}">{{ tournament.name }}</a>
+                <div class="small text-muted">{{ tournament.location }}</div>
+              </td>
+              <td>{{ tournament.start_date|date:"M j, Y" }}<br><span class="text-muted">to {{ tournament.end_date|date:"M j, Y" }}</span></td>
+              <td>{{ tournament.registration_opens_date|date:"M j, Y" }}</td>
+              <td>
+                {% if tournament.registrations.all %}
+                  {% regroup tournament.registrations.all by status_key as status_groups %}
+                  {% for status_group in status_groups %}
+                    <div class="team-status-group">
+                      <div class="small fw-semibold text-muted mb-1">{{ status_group.list.0.status_label }}</div>
+                      {% for registration in status_group.list %}
+                        <div class="team-line"><span>{{ registration.team.name }}</span><span class="status status-{{ registration.status_key }}">{{ registration.status_label }}</span></div>
+                      {% endfor %}
+                    </div>
+                  {% endfor %}
+                {% else %}
+                  <span class="text-muted">No teams yet</span>
+                {% endif %}
+              </td>
+              <td class="text-end text-nowrap">
+                <a class="btn btn-sm btn-outline-primary" href="{% url 'tournaments:detail' tournament.pk %}">Edit</a>
+                <a class="btn btn-sm btn-outline-danger" href="{% url 'tournaments:delete' tournament.pk %}">Remove</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <section class="card text-center p-5">
+      {% if search_query %}
+        <h2 class="h4">No tournaments match "{{ search_query }}".</h2>
+        <p class="text-muted">Try a different tournament name or clear the search.</p>
+        <div><a class="btn btn-outline-secondary" href="{% url 'tournaments:list' %}{% if current_sort %}?sort={{ current_sort }}{% endif %}">Clear search</a></div>
+      {% else %}
+        <h2 class="h4">No tournaments have been added.</h2>
+        <p class="text-muted">Create the first tournament to begin tracking teams and travel details.</p>
+        <div><a class="btn btn-primary" href="{% url 'tournaments:create' %}">Add tournament</a></div>
+      {% endif %}
+    </section>
+  {% endif %}
+{% endblock %}
