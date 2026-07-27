@@ -1,0 +1,55 @@
+{
+  "name": "tournament_overview",
+  "dockerComposeFile": [
+    "../compose/docker-compose.yml",
+    "docker-compose.api.vscode.yml",
+    "docker-compose.opencode.vscode.yml"
+    // ,"docker-compose.setup.vscode.yml"
+    ,
+    "docker-compose.postgres.vscode.yml"
+    // ,"docker-compose.celeryworker.vscode.yml"
+  ],
+  "shutdownAction": "stopCompose",
+  "workspaceFolder": "/app",
+  "service": "api",
+  // "initializeCommand": [
+  //   "bash",
+  //   "-c",
+  //   "cp compose/envs/.env . && echo $'\nCOMPOSE_PROJECT_NAME=yosemite_scraper' >> .env"
+  // ],
+  // "postAttachCommand": [
+  //   "rm",
+  //   "-f",
+  //   ".env"
+  // ],
+  // "runArgs": [
+  //   "--env-file",
+  //   "../.env"
+  // ],
+  "postCreateCommand": "curl -fsSl http://deb.nodesource.com/setup_lts.x | bash - && apt-get install -y nodejs && curl -fsSl https://opencode.ai/install | bash",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.formatting.autopep8Path": "/usr/local/py-utils/bin/autopep8",
+        "python.formatting.blackPath": "/usr/local/py-utils/bin/black",
+        "python.linting.flake8Path": "/usr/local/py-utils/bin/flake8",
+        "python.autoComplete.extraPaths": [
+          "/usr/local/lib/python3.12/site-packages"
+        ],
+        "python.analysis.extraPaths": [
+          "/usr/local/lib/python3.12/site-packages"
+        ]
+      },
+      "extensions": [
+        "ms-python.python",
+        "ms-azuretools.vscode-docker",
+        "GitHub.copilot-chat"
+      ]
+    }
+  },
+  "forwardPorts": [
+    80,
+    443
+  ]
+}

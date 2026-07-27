@@ -1,0 +1,6 @@
+name: yosemite_scraper_vscode
+services:
+  api:
+    env_file:
+      - ../compose/envs/.env
+    command: ["bash", "-c", "set -eu && sleep infinity"]

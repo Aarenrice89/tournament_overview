@@ -1,0 +1,51 @@
+[tool.poetry]
+name = "tournament-overview"
+version = "0.1.0"
+description = ""
+authors = ["Aaren Rice"]
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.12"
+python-dotenv = "^1.0.0"
+pytz = "^2023.3.post1"
+django = "^5.0.4"
+drf-spectacular = "^0.27.2"
+djangorestframework = "^3.15.1"
+django-environ = "^0.11.2"
+django-extensions = "^3.2.3"
+psycopg2-binary = "^2.9.9"
+django-cors-headers = "^3.13.0"
+gunicorn = "^21.1.0"
+djangorestframework-simplejwt = "^5.3.1"
+celery = "^5.2.7"
+django-celery-results = "^2.5.0"
+django-celery-beat = "^2.5.0"
+django-redis = "^5.4.0"
+django-cache-memoize = "^0.2.1"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.12.1"
+flake8 = "^7.0.0"
+isort = "^5.13.2"
+ipython = "^8.19.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+profile = "black"
+
+[tool.black]
+extend-exclude = '''
+(
+    ^/manage.py
+    | yosemite_scraper/wsgi.py
+    | yosemite_scraper/asgi.py
+    | migrations
+)
+'''
+include = '\.pyi?$'
+line-length = 119
+target-version = ['py311']

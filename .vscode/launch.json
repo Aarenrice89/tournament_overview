@@ -1,0 +1,94 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Django Server",
+      "type": "debugpy",
+      "request": "launch",
+      "stopOnEntry": false,
+      "program": "${workspaceFolder}/manage.py",
+      "args": [
+        "runserver",
+        "0.0.0.0:8080",
+      ],
+      "django": true,
+      "justMyCode": false,
+      "consoleName": "Django"
+    },
+    {
+      "name": "Celery Worker",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "celery",
+      "console": "integratedTerminal",
+      "args": [
+        "-A",
+        "yosemite_scraper",
+        "worker",
+        "-l",
+        "INFO",
+        "-P",
+        "solo",
+      ],
+      "django": true,
+      "justMyCode": true,
+      "consoleName": "Celery Worker"
+    },
+    {
+      "name": "PyTests:File",
+      "type": "debugpy",
+      "request": "launch",
+      "purpose": [
+        "debug-test"
+      ],
+      "console": "integratedTerminal",
+      "module": "pytest",
+      "args": [
+        "${file}",
+        "--verbose"
+      ],
+      "django": true,
+      "justMyCode": true,
+      "consoleName": "PyTest:File"
+    },
+    {
+      "name": "PyTests:All",
+      "type": "debugpy",
+      "request": "launch",
+      "purpose": [
+        "debug-test"
+      ],
+      "console": "integratedTerminal",
+      "module": "pytest",
+      "args": [
+        ".",
+        "--verbose"
+      ],
+      "django": true,
+      "justMyCode": false,
+      "consoleName": "PyTest:All"
+    },
+    {
+      "name": "Django Script",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/manage.py",
+      "args": [
+        "runscript",
+        "adhoc_script"
+      ],
+      "django": true,
+      "justMyCode": false,
+      "consoleName": "Django Script"
+    },
+  ],
+  "compounds": [
+    {
+      "name": "Django + Celery",
+      "configurations": [
+        "Django Server",
+        "Celery Worker"
+      ]
+    }
+  ]
+}

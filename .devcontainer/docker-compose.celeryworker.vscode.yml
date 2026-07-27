@@ -1,0 +1,5 @@
+services:
+  celeryworker:
+    command: []
+    volumes:
+      - "../:/app"

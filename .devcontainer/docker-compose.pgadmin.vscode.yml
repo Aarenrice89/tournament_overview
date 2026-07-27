@@ -1,0 +1,27 @@
+services:
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    restart: always
+    environment:
+      - PGADMIN_SERVER_JSON_FILE: /pgadmin4/servers.json
+      - PGADMIN_DEFAULT_EMAIL: postgres@postgres.com
+      - PGADMIN_DEFAULT_PASSWORD: postgres
+      - PGADMIN_LISTEN_PORT: 80
+    depends_on:
+      - db
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pgadmin_${COMPOSE_PROJECT_NAME}_http.rule=Host(`pgadmin.south-bay-specials.localhost`)"
+      - "traefik.http.routers.pgadmin_${COMPOSE_PROJECT_NAME}_http.entrypoints=web"
+      - "traefik.docker.network=proxy"
+    expose:
+      - 80
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+      - ../.devcontainer/pgadmin_server_config/servers.json:/pgadmin4/servers.json
+    networks:
+      - proxy
+      - default
+
+volumes:
+  pgadmin-data:
