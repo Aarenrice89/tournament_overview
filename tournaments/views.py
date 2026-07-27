@@ -96,7 +96,7 @@ class TournamentUpdateView(StaffRequiredMixin, UpdateView):
         return self.render_to_response(self.get_context_data(form=form, formset=formset))
 
     def get_success_url(self):
-        return reverse_lazy("tournaments:detail", kwargs={"pk": self.object.pk})
+        return reverse_lazy("tournaments:list")
 
 
 class TournamentDeleteView(StaffRequiredMixin, DeleteView):
