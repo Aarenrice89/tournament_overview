@@ -4,7 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db import transaction
 from django.db.models import Case, F, IntegerField, Prefetch, Value, When
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, DeleteView, ListView, UpdateView
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from .forms import TeamForm, TournamentForm, TournamentRegistrationFormSet
 from .models import Team, Tournament, TournamentRegistration
@@ -116,6 +116,19 @@ class TeamCreateView(StaffRequiredMixin, CreateView):
     form_class = TeamForm
     template_name = "tournaments/team_form.html"
     success_url = reverse_lazy("tournaments:team-list")
+
+
+class TeamTournamentListView(StaffRequiredMixin, DetailView):
+    model = Team
+    context_object_name = "team"
+    template_name = "tournaments/team_tournament_list.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["registrations"] = self.object.tournament_registrations.select_related("tournament").order_by(
+            "tournament__start_date", "tournament__name"
+        )
+        return context
 
 
 class TeamUpdateView(StaffRequiredMixin, UpdateView):

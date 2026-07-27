@@ -11,5 +11,6 @@ urlpatterns = [
     path("tournaments/<int:pk>/delete/", views.TournamentDeleteView.as_view(), name="delete"),
     path("teams/", views.TeamListView.as_view(), name="team-list"),
     path("teams/add/", views.TeamCreateView.as_view(), name="team-create"),
+    path("teams/<int:pk>/tournaments/", views.TeamTournamentListView.as_view(), name="team-tournaments"),
     path("teams/<int:pk>/", views.TeamUpdateView.as_view(), name="team-update"),
 ]

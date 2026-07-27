@@ -26,16 +26,19 @@ services:
       - ./envs/.env
     expose:
       - 8080
+    # ports:
+    #   - "192.168.0.52:18080:8080"
     depends_on:
       - db
       - setup
       - cache
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.api_${COMPOSE_PROJECT_NAME}_http.rule=Host(`api.tournament-overview.localhost`)"
-      - "traefik.http.routers.api_${COMPOSE_PROJECT_NAME}_http.tls=true"
-      - "traefik.http.routers.api_${COMPOSE_PROJECT_NAME}_http.entrypoints=websecure"
       - "traefik.docker.network=proxy"
+      - "traefik.http.routers.tournament-overview.rule=Host(`tournament-overview.lab.ricehouse.me`)"
+      - "traefik.http.routers.tournament-overview.entrypoints=websecure"
+      - "traefik.http.routers.tournament-overview.tls.certresolver=cloudflare"
+      - "traefik.http.services.tournament-overview.loadbalancer.server.port=8080"
     volumes:
       - "../:/app"
     stdin_open: true
@@ -84,7 +87,6 @@ services:
   #   command: [ "bash", "/app/compose/services/start-celery.sh", "-s", "beat" ]
   #   networks:
   #     - default
-
   # celeryflower:
   #   <<: *app
   #   depends_on:

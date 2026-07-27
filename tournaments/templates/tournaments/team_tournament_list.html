@@ -1,0 +1,43 @@
+{% extends "tournaments/base.html" %}
+
+{% block title %}{{ team.name }} tournaments{% endblock %}
+
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-4 page-header ps-3">
+    <div>
+      <h1 class="h2 mb-1">{{ team.name }}</h1>
+      <p class="text-muted mb-0">Tournament registrations and readiness.</p>
+    </div>
+    <a class="btn btn-outline-secondary" href="{% url 'tournaments:team-list' %}">Back to teams</a>
+  </div>
+
+  {% if registrations %}
+    <div class="table-responsive bg-white rounded">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th scope="col">Tournament</th>
+            <th scope="col">Dates</th>
+            <th scope="col">Location</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for registration in registrations %}
+            <tr>
+              <td><a class="fw-semibold text-decoration-none" href="{% url 'tournaments:detail' registration.tournament.pk %}">{{ registration.tournament.name }}</a></td>
+              <td>{{ registration.tournament.start_date|date:"M j, Y" }}{% if registration.tournament.end_date %}<br><span class="text-muted">to {{ registration.tournament.end_date|date:"M j, Y" }}</span>{% endif %}</td>
+              <td>{{ registration.tournament.location }}</td>
+              <td><span class="status status-{{ registration.status_key }}">{{ registration.status_label }}</span></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <section class="card text-center p-5">
+      <h2 class="h4">No tournament registrations yet.</h2>
+      <p class="text-muted mb-0">Add this team to a tournament from that tournament's detail page.</p>
+    </section>
+  {% endif %}
+{% endblock %}
