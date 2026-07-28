@@ -1,0 +1,57 @@
+name: midtnvbc
+
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    env_file:
+      - ./envs/.env.production
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  cache:
+    image: redis:alpine
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ../
+      dockerfile: ./compose/services/Dockerfile
+      target: production_image
+    restart: unless-stopped
+    env_file:
+      - ./envs/.env.production
+    depends_on:
+      db:
+        condition: service_healthy
+      cache:
+        condition: service_started
+    expose:
+      - "8080"
+    volumes:
+      - static-data:/app/dist
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./services/Caddyfile:/etc/caddy/Caddyfile:ro
+      - static-data:/srv/static:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
+volumes:
+  caddy-config:
+  caddy-data:
+  db-data:
+  static-data:

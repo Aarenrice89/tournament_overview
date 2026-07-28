@@ -4,7 +4,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db import transaction
 from django.db.models import Case, F, IntegerField, Prefetch, Value, When
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
+from django.views.generic import (
+    CreateView,
+    DeleteView,
+    DetailView,
+    ListView,
+    UpdateView,
+)
 
 from .forms import TeamForm, TournamentForm, TournamentRegistrationFormSet
 from .models import Team, Tournament, TournamentRegistration

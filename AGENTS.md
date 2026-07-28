@@ -4,6 +4,7 @@
 - Django commands need the PostgreSQL and secret-key values in `compose/envs/.env`. Do not source that file in Bash; it contains shell metacharacters. Parse it with `python-dotenv` or run commands in the Compose environment.
 - The Compose stack requires an external `proxy` network: `docker network create proxy`. The devcontainer leaves `api` idle; start Django there with `bash compose/services/start-django.sh`.
 - Compose `setup` applies migrations, runs `create_default_admin`, and collects static files before the app starts.
+- Production uses `compose/docker-compose.production.yml` with Caddy as the only public service. Create, but never commit, `compose/envs/.env.production` from its example.
 
 # Structure
 

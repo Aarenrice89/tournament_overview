@@ -38,24 +38,9 @@ CMD ["bash", "./compose/services/start-django.sh"]
 # manage.py createsuperuser --noinput --username DJANGO_SUPERUSER_USERNAME --email DJANGO_SUPERUSER_EMAIL --password DJANGO_SUPERUSER_PASSWORD
 
 
-# FROM app_base as prod_image
+FROM app_base as production_image
 
-# ARG REPOSITORY_URL
-# ARG COMMIT_HASH
-# ARG PROJECT_NAME
-# ARG NEW_RELIC_METADATA_REPOSITORY_URL=${REPOSITORY_URL}
-# ARG NEW_RELIC_METADATA_COMMIT=${COMMIT_HASH}
-# ARG PROJECT_NAME=${PROJECT_NAME}
+RUN poetry install --only main --no-root
+COPY . .
 
-# COPY --from=lacework_image /var/lib/lacework-backup /var/lib/lacework-backup
-
-# RUN poetry install --only main
-
-# COPY . .
-
-# RUN mkdir -p /app/dist
-# RUN chown -R $USERNAME /app/dist
-
-# USER $USERNAME
-
-# CMD ["bash", "./compose/services/web/startup-with-lw.sh"]
+CMD ["bash", "./compose/services/start-production.sh"]
