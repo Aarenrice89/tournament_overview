@@ -1,0 +1,27 @@
+{% extends "tournaments/base.html" %}
+
+{% block title %}Delete {{ object.name }}{% endblock %}
+
+{% block content %}
+  <section class="card p-4 mx-auto" style="max-width: 42rem;">
+    <h1 class="h3">Delete {{ object.name }}?</h1>
+    <p>This removes the reusable team and its registrations. Tournaments will not be deleted.</p>
+
+    {% if registrations %}
+      <p class="fw-semibold mb-2">The team will be removed from these tournaments:</p>
+      <ul class="mb-4">
+        {% for registration in registrations %}
+          <li>{{ registration.tournament.name }}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-muted">This team is not registered for any tournaments.</p>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      <button class="btn btn-danger" type="submit">Delete team and registrations</button>
+      <a class="btn btn-outline-secondary" href="{% url 'tournaments:team-list' %}">Cancel</a>
+    </form>
+  </section>
+{% endblock %}

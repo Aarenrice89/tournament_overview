@@ -137,6 +137,24 @@ class TeamTournamentListView(StaffRequiredMixin, DetailView):
         return context
 
 
+class TeamDeleteView(StaffRequiredMixin, DeleteView):
+    model = Team
+    template_name = "tournaments/team_confirm_delete.html"
+    success_url = reverse_lazy("tournaments:team-list")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["registrations"] = self.object.tournament_registrations.select_related("tournament").order_by(
+            "tournament__start_date", "tournament__name"
+        )
+        return context
+
+    def form_valid(self, form):
+        with transaction.atomic():
+            self.object.tournament_registrations.all().delete()
+            return super().form_valid(form)
+
+
 class TeamUpdateView(StaffRequiredMixin, UpdateView):
     model = Team
     form_class = TeamForm
