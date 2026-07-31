@@ -1,0 +1,2 @@
+{% extends "coaches/base.html" %}
+{% block content %}<div class="card shadow-sm"><div class="card-body p-4"><h1 class="h3">Delete work record?</h1><p>This will permanently remove {{ object.get_activity_display }} from {{ object.work_date }}.</p><form method="post">{% csrf_token %}<button class="btn btn-danger">Delete</button> <a class="btn btn-outline-secondary" href="javascript:history.back()">Cancel</a></form></div></div>{% endblock %}

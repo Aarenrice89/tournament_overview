@@ -17,7 +17,7 @@ from .models import Team, Tournament, TournamentRegistration
 
 
 class StaffRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
-    login_url = "admin:login"
+    login_url = "coaches:login"
 
     def test_func(self):
         return self.request.user.is_staff

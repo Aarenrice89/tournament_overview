@@ -51,9 +51,8 @@ INSTALLED_APPS = [
     "corsheaders",
     "drf_spectacular",
     # "rest_framework_simplejwt.token_blacklist",
-    "django_celery_results",
-    "django_celery_beat",
     # Custom apps
+    "coaches",
     "tournaments",
 ]
 
@@ -139,7 +138,7 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "dist"
-STATICFILES_DIRS = []
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -220,7 +219,6 @@ REDIS_HOST = env("REDIS_HOST", default="cache")
 REDIS_PORT = env("REDIS_PORT", default="6379")
 REDIS_DB = env("REDIS_DB", default=1)
 REDIS_MEMOIZE_DB = env("REDIS_MEMOIZE_DB", default=2)
-REDIS_CELERY_DB = env("REDIS_CELERY_DB", default=3)
 
 CACHES = {
     "default": {
@@ -237,29 +235,7 @@ CACHES = {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         },
     },
-    "celery": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_CELERY_DB}",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        },
-    },
 }
-
-# # Celery
-CELERY_TIMEZONE = "UTC"
-CELERY_TASK_TRACK_STARTED = True
-CELERY_TASK_TIME_LIMIT = 30 * 60
-
-CELERY_ACCEPT_CONTENT = ["json"]
-CELERY_TASK_SERIALIZER = "json"
-
-CELERY_BROKER_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}"
-CELERY_CACHE_BACKEND = "celery"
-CELERY_RESULT_BACKEND = "django-cache"
-
-CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
-CELERY_BROKER_CONNECTION_RETRY = True
 
 # Logging
 LOG_LEVEL = env("LOG_LEVEL", default="DEBUG" if DEBUG else "INFO")
@@ -296,8 +272,10 @@ DJANGO_LOG_LEVEL = env("DJANGO_LOG_LEVEL", default="INFO")
 
 # Email
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_USE_TLS = True
-EMAIL_PORT = 587
+EMAIL_HOST = env("EMAIL_HOST", default="smtp.gmail.com")
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
+EMAIL_PORT = env.int("EMAIL_PORT", default=587)
 EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default=EMAIL_HOST_USER)
+SITE_URL = env("SITE_URL", default="http://localhost:8080")

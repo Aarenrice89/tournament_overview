@@ -54,7 +54,7 @@ class TournamentViewTests(TestCase):
     def test_overview_requires_staff_login(self):
         response = self.client.get(reverse("tournaments:list"))
 
-        self.assertRedirects(response, f"{reverse('admin:login')}?next=/")
+        self.assertRedirects(response, f"{reverse('coaches:login')}?next=/tournaments/")
 
     def test_overview_displays_team_status(self):
         team = Team.objects.create(name="Thunder 16U")
@@ -72,6 +72,8 @@ class TournamentViewTests(TestCase):
         self.assertContains(response, "Spring Classic")
         self.assertContains(response, "Thunder 16U")
         self.assertContains(response, "Registered + paid + rosters")
+        self.assertContains(response, reverse("landing"))
+        self.assertContains(response, "portal-header--admin")
 
     def test_staff_can_create_a_tournament(self):
         self.client.force_login(self.staff_user)

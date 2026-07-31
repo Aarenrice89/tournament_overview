@@ -1,0 +1,31 @@
+{% extends "coaches/base.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4"><h1 class="h2 mb-0">{% if object %}Edit{% else %}Add{% endif %} additional work</h1>{% if is_staff_portal %}<a class="btn btn-outline-secondary" href="{% url 'coaches:admin-payroll' %}">Cancel</a>{% else %}<a class="btn btn-outline-secondary" href="{% url 'coaches:dashboard' %}">Cancel</a>{% endif %}</div>
+<form method="post" class="card shadow-sm"><div class="card-body p-4">{% csrf_token %}
+  {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+  {% if form.coach %}<div class="mb-3">{{ form.coach.label_tag }}{{ form.coach }}{{ form.coach.errors }}</div>{% endif %}
+  <div class="row"><div class="col-md-6 mb-3">{{ form.activity.label_tag }}{{ form.activity }}{{ form.activity.errors }}</div><div class="col-md-6 mb-3">{{ form.work_date.label_tag }}{{ form.work_date }}{{ form.work_date.errors }}</div></div>
+  <div id="hourly-fields" class="mb-3">{{ form.hours_worked.label_tag }}{{ form.hours_worked }}<div class="form-text">Use half-hour increments from 0.5 through 12.</div>{{ form.hours_worked.errors }}</div>
+  <div id="tournament-fields" class="mb-3">{{ form.tournament_days.label_tag }}{{ form.tournament_days }}{{ form.tournament_days.errors }}</div>
+  <div id="lesson-fields" class="mb-3">
+    <label class="form-label">Private lessons</label>{{ lesson_formset.management_form }}{{ lesson_formset.non_form_errors }}
+    <div id="lesson-forms">{% for lesson_form in lesson_formset %}<div class="border rounded p-3 mb-2 lesson-form">{% for hidden in lesson_form.hidden_fields %}{{ hidden }}{% endfor %}{{ lesson_form.DELETE.as_hidden }}<div class="d-flex justify-content-between align-items-center mb-3"><h3 class="h6 mb-0 lesson-title">Private Lesson {{ forloop.counter }}</h3><button class="btn btn-sm btn-outline-danger remove-lesson" type="button">Remove lesson</button></div><div>{{ lesson_form.children_coached.label_tag }}{{ lesson_form.children_coached }}{{ lesson_form.children_coached.errors }}</div></div>{% endfor %}</div>
+    <template id="lesson-empty-form"><div class="border rounded p-3 mb-2 lesson-form">{% for hidden in lesson_formset.empty_form.hidden_fields %}{{ hidden }}{% endfor %}{{ lesson_formset.empty_form.DELETE.as_hidden }}<div class="d-flex justify-content-between align-items-center mb-3"><h3 class="h6 mb-0 lesson-title">Private Lesson</h3><button class="btn btn-sm btn-outline-danger remove-lesson" type="button">Remove lesson</button></div><div>{{ lesson_formset.empty_form.children_coached.label_tag }}{{ lesson_formset.empty_form.children_coached }}{{ lesson_formset.empty_form.children_coached.errors }}</div></div></template><button class="btn btn-sm btn-outline-primary" id="add-lesson" type="button">Add lesson</button>
+  </div>
+  <div class="mb-3">{{ form.notes.label_tag }}{{ form.notes }}<div class="form-text">Any other details we need to know?</div>{{ form.notes.errors }}</div>
+  <button id="save-work" class="btn btn-primary" disabled>Save work</button>
+</div></form>
+<script>
+  const activity = document.getElementById('id_activity');
+  const hourlyFields = document.getElementById('hourly-fields');
+  const tournamentFields = document.getElementById('tournament-fields');
+  const lessonFields = document.getElementById('lesson-fields');
+  const saveWork = document.getElementById('save-work');
+  const hourlyActivities = ['club_practice', 'academy', 'volley_tots', 'volley_jrs', 'camp_clinic', 'other'];
+  function updateFields() { const value = activity.value; hourlyFields.hidden = !hourlyActivities.includes(value); tournamentFields.hidden = value !== 'tournament'; lessonFields.hidden = value !== 'private_lesson'; saveWork.disabled = !value; }
+  activity.addEventListener('change', updateFields); updateFields();
+  function renumberLessons() { let number = 1; document.querySelectorAll('.lesson-form').forEach((lesson) => { if (!lesson.hidden) { lesson.querySelector('.lesson-title').textContent = `Private Lesson ${number}`; number += 1; } }); }
+  document.getElementById('add-lesson').addEventListener('click', () => { const total = document.getElementById('id_lessons-TOTAL_FORMS'); const index = total.value; const html = document.getElementById('lesson-empty-form').innerHTML.replaceAll('__prefix__', index); document.getElementById('lesson-forms').insertAdjacentHTML('beforeend', html); total.value = Number(index) + 1; renumberLessons(); });
+  document.getElementById('lesson-forms').addEventListener('click', (event) => { const button = event.target.closest('.remove-lesson'); if (!button) return; const lesson = button.closest('.lesson-form'); lesson.querySelector('input[name$="-DELETE"]').value = 'on'; lesson.hidden = true; renumberLessons(); });
+</script>
+{% endblock %}

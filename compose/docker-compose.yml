@@ -61,49 +61,6 @@ services:
     expose:
       - "6379"
 
-  # celeryworker:
-  #   <<: *app
-  #   depends_on:
-  #     - db
-  #     - cache
-  #   volumes: []
-  #   ports: []
-  #   labels: []
-  #   command: [ "bash", "/app/compose/services/start-celery.sh", "-s", "worker" ]
-  #   networks:
-  #     - default
-
-  # celerybeat:
-  #   <<: *app
-  #   depends_on:
-  #     - db
-  #     - cache
-  #   volumes: []
-  #   ports: []
-  #   labels: []
-  #   command: [ "bash", "/app/compose/services/start-celery.sh", "-s", "beat" ]
-  #   networks:
-  #     - default
-
-  # celeryflower:
-  #   <<: *app
-  #   depends_on:
-  #     - db
-  #     - cache
-  #   volumes: []
-  #   ports: []
-  #   expose:
-  #     - 5555
-  #   labels:
-  #     - "traefik.enable=true"
-  #     - "traefik.http.routers.flower_${COMPOSE_PROJECT_NAME}_http.rule=Host(`flower.tournament-overview.localhost`)"
-  #     - "traefik.http.routers.flower_${COMPOSE_PROJECT_NAME}_http.tls=true"
-  #     - "traefik.http.routers.flower_${COMPOSE_PROJECT_NAME}_http.entrypoints=websecure"
-  #     - "traefik.docker.network=proxy"
-  #   command: ["bash", "./compose/services/web/start-celery.sh", "-s", "flower"]
-  #   networks:
-  #     - default
-
 volumes:
   db-data:
 

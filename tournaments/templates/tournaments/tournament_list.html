@@ -49,6 +49,7 @@
                 Registration opens{% if current_sort == "registration_opens" %} &uarr;{% elif current_sort == "-registration_opens" %} &darr;{% endif %}
               </a>
             </th>
+            <th scope="col">Registration link</th>
             <th scope="col">Teams entered</th>
             <th scope="col" class="text-end">Actions</th>
           </tr>
@@ -62,6 +63,7 @@
               </td>
               <td>{{ tournament.start_date|date:"M j, Y" }}<br><span class="text-muted">to {{ tournament.end_date|date:"M j, Y" }}</span></td>
               <td>{{ tournament.registration_opens_date|date:"M j, Y" }}</td>
+              <td>{% if tournament.registration_link %}<a href="{{ tournament.registration_link }}" target="_blank" rel="noopener noreferrer">Open registration</a>{% else %}<span class="text-muted">&mdash;</span>{% endif %}</td>
               <td>
                 {% if tournament.registrations.all %}
                   {% regroup tournament.registrations.all by status_key as status_groups %}

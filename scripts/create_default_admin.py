@@ -14,7 +14,7 @@ def run():
             username="admin",
             first_name="default",
             last_name="admin",
-            email="admin@sbs.com",
+            email="admin@midtnvbc.com",
             password=settings.SUPER_USER_PASSWORD,
         )
         logger.info("Createcd default admin")

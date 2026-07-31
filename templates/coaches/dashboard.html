@@ -1,0 +1,30 @@
+{% extends "coaches/base.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div><h1 class="h2 mb-1">Additional Work</h1><p class="text-muted mb-0">{{ month|date:"F Y" }}</p></div>
+  {% if compensation_configured and not month_is_paid and not month_is_future and not month_is_uninitialized_past %}<a class="btn btn-primary" href="{% url 'coaches:work-add' %}">Add work</a>{% endif %}
+</div>
+{% if not compensation_configured %}
+  <div class="alert alert-warning">An administrator must configure your monthly and hourly pay rates before you can add work.</div>
+{% endif %}
+{% if month_is_paid %}
+  <div class="alert alert-info">This month has been paid. Contact an administrator for any work changes.</div>
+{% endif %}
+{% if month_is_future %}
+  <div class="alert alert-info">This month has not started yet. Additional work can be recorded once the month begins.</div>
+{% endif %}
+{% if month_is_uninitialized_past %}
+  <div class="alert alert-info">This prior month has not been initialized. Contact an administrator before adding work.</div>
+{% endif %}
+<form class="row g-2 mb-4" method="get"><div class="col-auto"><label class="visually-hidden" for="month">Month</label><input id="month" name="month" type="month" class="form-control" value="{{ month|date:'Y-m' }}" onchange="this.form.submit()"></div></form>
+{% if payroll %}
+  <div class="row mb-4">
+    <div class="col-md-4"><div class="card"><div class="card-body"><small class="text-muted">Base pay</small><div class="h4 mb-0">${{ payroll.base_rate_snapshot }}</div></div></div></div>
+    <div class="col-md-4"><div class="card"><div class="card-body"><small class="text-muted">Additional work</small><div class="h4 mb-0">${{ payroll.additional_work_total }}</div></div></div></div>
+    <div class="col-md-4"><div class="card"><div class="card-body"><small class="text-muted">Total compensation</small><div class="h4 mb-0">${{ payroll.total_compensation }}</div></div></div></div>
+  </div>
+{% endif %}
+<div class="card shadow-sm"><div class="table-responsive"><table class="table table-hover mb-0"><thead><tr><th>Date</th><th>Activity</th><th>Payment</th><th></th></tr></thead><tbody>
+{% for work in work_items %}<tr><td>{{ work.work_date }}</td><td>{{ work.get_activity_display }}</td><td>${{ work.payment_amount }}</td><td><a href="{% url 'coaches:work-detail' work.pk %}">View</a></td></tr>{% empty %}<tr><td colspan="4" class="text-center text-muted py-4">No additional work recorded for this month.</td></tr>{% endfor %}
+</tbody></table></div></div>
+{% endblock %}

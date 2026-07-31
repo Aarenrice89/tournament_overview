@@ -1,0 +1,34 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if user.is_staff %}Admin Portal{% else %}Coaches Portal{% endif %}</title>
+  <link rel="icon" href="{% static 'tournament_overview/images/mtnvbc-favicon.png' %}" type="image/svg+xml">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="{% static 'tournament_overview/portal.css' %}" rel="stylesheet">
+</head>
+<body class="portal-body">
+  <header class="navbar navbar-expand portal-header {% if user.is_staff or not user.is_authenticated %}portal-header--admin{% else %}portal-header--coach{% endif %}">
+    <div class="container"><a class="navbar-brand" href="{% url 'landing' %}"><img class="portal-logo" src="{% static 'tournament_overview/images/mtnvbc-logo.png' %}" alt="Mid TN Volleyball Club"><span class="portal-title">{% if user.is_staff %}Admin Portal{% else %}Coaches Portal{% endif %}</span></a>{% if user.is_authenticated %}<form method="post" action="{% url 'coaches:logout' %}">{% csrf_token %}<button class="btn btn-outline-light">Log out</button></form>{% endif %}</div>
+  </header>
+  <main class="container py-5">
+    <div class="mb-5"><h1 class="display-6 mb-2">Welcome{% if user.is_authenticated and user.get_full_name %}, {{ user.get_full_name }}{% endif %}</h1><p class="lead text-muted mb-0">Choose an application to continue.</p></div>
+    {% if user.is_authenticated %}
+      <div class="row g-4">
+        {% for application in applications %}
+          <div class="col-md-6 col-lg-4"><a class="card portal-app-card h-100 text-decoration-none text-body" href="{{ application.url }}"><div class="card-body p-4"><h2 class="h4">{{ application.title }}</h2><p class="text-muted mb-0">{{ application.description }}</p></div></a></div>
+        {% empty %}
+          <div class="col"><div class="alert alert-warning">Your account does not have access to a portal application.</div></div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="row g-4">
+        <div class="col-md-6"><div class="card portal-app-card h-100"><div class="card-body p-4"><h2 class="h4">Coach login</h2><p class="text-muted">Access your work records and monthly payroll.</p><a class="btn btn-primary" href="{% url 'coaches:login' %}">Coach login</a></div></div></div>
+        <div class="col-md-6"><div class="card portal-app-card h-100"><div class="card-body p-4"><h2 class="h4">Staff login</h2><p class="text-muted">Access administrative tools for tournaments and payroll.</p><a class="btn btn-outline-primary" href="{% url 'coaches:login' %}?next={% url 'landing' %}">Staff login</a></div></div></div>
+      </div>
+    {% endif %}
+  </main>
+</body>
+</html>
