@@ -19,11 +19,10 @@ services:
     restart: unless-stopped
 
   api:
-    build:
-      context: ../
-      dockerfile: ./compose/services/Dockerfile
-      target: production_image
+    image: ghcr.io/${GHCR_IMAGE:?Set GHCR_IMAGE to the lowercase GitHub owner/repository}:production
     restart: unless-stopped
+    labels:
+      com.centurylinklabs.watchtower.enable: "true"
     env_file:
       - ./envs/.env.production
     depends_on:
@@ -35,6 +34,14 @@ services:
       - "8080"
     volumes:
       - static-data:/app/dist
+
+  watchtower:
+    image: containrrr/watchtower:1.7.1
+    restart: unless-stopped
+    command: --label-enable --registry-auth --cleanup --interval 300
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${HOME}/.docker/config.json:/config.json:ro
 
   caddy:
     image: caddy:2-alpine
