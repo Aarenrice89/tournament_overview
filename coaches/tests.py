@@ -1,8 +1,10 @@
 from datetime import timedelta
 from decimal import Decimal
+from uuid import uuid4
 
 from django.contrib.auth import get_user_model
 from django.core import mail
+from django.core.cache import cache
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
@@ -60,6 +62,58 @@ class CoachInvitationTests(TestCase):
         response = self.client.get(reverse("coaches:register", kwargs={"token": invitation.token}))
 
         self.assertEqual(response.status_code, 404)
+
+
+@override_settings(
+    CACHES={"default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"}},
+    AXES_CACHE="default",
+    SECURE_SSL_REDIRECT=False,
+)
+class LoginThrottlingTests(TestCase):
+    def setUp(self):
+        cache.clear()
+        self.user = get_user_model().objects.create_user(username=f"coach-{uuid4().hex}", password="correct-password")
+
+    def tearDown(self):
+        cache.clear()
+
+    def test_coach_login_locks_after_five_failed_attempts(self):
+        url = reverse("coaches:login")
+
+        for _ in range(4):
+            response = self.client.post(url, {"username": self.user.username, "password": "wrong-password"})
+            self.assertEqual(response.status_code, 200)
+
+        response = self.client.post(url, {"username": self.user.username, "password": "wrong-password"})
+
+        self.assertEqual(response.status_code, 429)
+
+    def test_admin_login_is_throttled(self):
+        self.user.is_staff = True
+        self.user.save(update_fields=["is_staff"])
+        url = reverse("admin:login")
+
+        for _ in range(4):
+            response = self.client.post(url, {"username": self.user.username, "password": "wrong-password"})
+            self.assertEqual(response.status_code, 200)
+
+        response = self.client.post(url, {"username": self.user.username, "password": "wrong-password"})
+
+        self.assertEqual(response.status_code, 429)
+
+    def test_successful_login_resets_failed_attempts(self):
+        url = reverse("coaches:login")
+
+        for _ in range(4):
+            self.client.post(url, {"username": self.user.username, "password": "wrong-password"})
+
+        response = self.client.post(url, {"username": self.user.username, "password": "correct-password"})
+        self.assertRedirects(response, reverse("landing"))
+
+        self.client.logout()
+        for _ in range(4):
+            response = self.client.post(url, {"username": self.user.username, "password": "wrong-password"})
+            self.assertEqual(response.status_code, 200)
 
 
 class CompensationTests(TestCase):
