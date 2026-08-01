@@ -6,5 +6,8 @@ midtnvbc.ricehouse.me {
         file_server
     }
 
-    reverse_proxy api:8080
+    reverse_proxy api:8080 {
+        # Prevent clients from spoofing the address used for login throttling.
+        header_up X-Forwarded-For {remote_host}
+    }
 }

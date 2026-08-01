@@ -116,7 +116,7 @@ class CoachRegistrationView(FormView):
         except IntegrityError:
             form.add_error("username", "This username is already in use.")
             return self.form_invalid(form)
-        login(self.request, user)
+        login(self.request, user, backend="django.contrib.auth.backends.ModelBackend")
         messages.success(self.request, "Your coach account is ready. An administrator will configure your pay rates.")
         return redirect("coaches:dashboard")
 
