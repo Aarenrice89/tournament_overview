@@ -34,7 +34,7 @@ The production API image is published to GitHub Container Registry whenever a co
 
 ## Releases
 
-After the initial setup, a push to `main` publishes `:production` and an immutable `:sha-<commit>` image tag. Watchtower updates only the API container; it does not update PostgreSQL, Redis, Caddy, or itself.
+After the initial setup, a push to `main` publishes `:production` and an immutable `:sha-<commit>` image tag. The pinned `nickfedor/watchtower:1.20.2` service checks for updates every five minutes and recreates only the labeled API container.
 
 The API startup command applies Django migrations and collects static files before starting Gunicorn. Keep schema migrations backward-compatible for automatic rollout. For destructive or non-reversible migrations, take a database backup and temporarily perform a controlled manual deployment instead.
 

@@ -3,7 +3,7 @@
 - Use Python 3.12 and Poetry. Docker development installs dependencies with `poetry install --no-root`.
 - Django requires values from `compose/envs/.env`, including PostgreSQL and `DJANGO_SECRET_KEY`. Do not source this file in Bash because it contains shell metacharacters; use `python-dotenv` or run inside Compose.
 - The development Compose stack requires the external `proxy` network: `docker network create proxy`. Its `setup` service migrates, runs `create_default_admin`, and collects static files; start Django in the `api` container with `bash compose/services/start-django.sh`.
-- Production uses `compose/docker-compose.production.yml`; Caddy is the only public service. Create `compose/envs/.env.production` from its example, set `GHCR_IMAGE`, and never commit it. GitHub Actions publishes the API image to private GHCR; Watchtower updates only the labeled API container.
+- Production uses `compose/docker-compose.production.yml`; Caddy is the only public service. Create `compose/envs/.env.production` from its example, set `GHCR_IMAGE`, and never commit it. GitHub Actions publishes the API image to private GHCR; the pinned `nickfedor/watchtower:1.20.2` service updates only the labeled API container.
 
 # Structure
 

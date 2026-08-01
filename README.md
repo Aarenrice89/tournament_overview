@@ -66,6 +66,6 @@ poetry run python manage.py test tournaments coaches tournament_overview
 
 ## Production
 
-Production uses `compose/docker-compose.production.yml` with Caddy as the only public service. GitHub Actions publishes the API image to private GitHub Container Registry after pushes to `main`; Watchtower updates only the labeled API container.
+Production uses `compose/docker-compose.production.yml` with Caddy as the only public service. GitHub Actions publishes the API image to private GitHub Container Registry after pushes to `main`; the pinned `nickfedor/watchtower:1.20.2` service updates only the labeled API container.
 
 Create production configuration from `compose/envs/.env.production.example`, set all secrets and `GHCR_IMAGE`, then follow [DEPLOYMENT.md](DEPLOYMENT.md) for GitHub and DigitalOcean setup. Never commit production environment files.
