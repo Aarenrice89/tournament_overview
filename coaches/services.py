@@ -53,6 +53,27 @@ def initialize_payroll_month(month, initialized_by=None):
     return payrolls
 
 
+def initialize_current_and_future_payrolls_for_coach(coach):
+    """Create missing rate snapshots for initialized months without altering existing payrolls."""
+    from .models import CoachMonthlyPayroll, PayrollMonth
+
+    if not coach.compensation_configured:
+        return []
+
+    current_month = payroll_month_for(central_today())
+    payrolls = []
+    for month in PayrollMonth.objects.filter(month__gte=current_month, initialized_at__isnull=False).values_list(
+        "month", flat=True
+    ):
+        payroll, _ = CoachMonthlyPayroll.objects.get_or_create(
+            coach=coach,
+            month=month,
+            defaults={"base_rate_snapshot": coach.monthly_base_rate},
+        )
+        payrolls.append(payroll)
+    return payrolls
+
+
 def is_month_paid(month):
     from .models import PayrollMonth
 

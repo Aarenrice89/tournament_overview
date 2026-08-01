@@ -8,8 +8,19 @@ from django.urls import reverse
 from django.utils import timezone
 
 from .forms import AdditionalWorkForm
-from .models import AdditionalWork, CoachInvitation, CoachProfile, PrivateLesson
-from .services import recalculate_private_lesson_payment
+from .models import (
+    AdditionalWork,
+    CoachInvitation,
+    CoachMonthlyPayroll,
+    CoachProfile,
+    PayrollMonth,
+    PrivateLesson,
+)
+from .services import (
+    central_today,
+    payroll_month_for,
+    recalculate_private_lesson_payment,
+)
 
 
 class CoachInvitationTests(TestCase):
@@ -220,3 +231,37 @@ class StaffCoachEditTests(TestCase):
         self.assertEqual(coach.user.email, "new@example.com")
         self.assertEqual(coach.monthly_base_rate, Decimal("1200.00"))
         self.assertEqual(coach.additional_hourly_rate, Decimal("60.00"))
+
+    def test_editing_rates_initializes_current_and_future_months_only(self):
+        staff = get_user_model().objects.create_user(username="admin", password="password", is_staff=True)
+        coach = CoachProfile.objects.create(
+            user=get_user_model().objects.create_user(username="coach", password="password")
+        )
+        current_month = payroll_month_for(central_today())
+        previous_month = (current_month - timedelta(days=1)).replace(day=1)
+        future_month = (current_month + timedelta(days=32)).replace(day=1)
+        for month in [previous_month, current_month, future_month]:
+            PayrollMonth.objects.create(month=month, initialized_at=timezone.now())
+        self.client.force_login(staff)
+
+        response = self.client.post(
+            reverse("coaches:admin-coach-edit", kwargs={"pk": coach.pk}),
+            {
+                "first_name": "New",
+                "last_name": "Coach",
+                "email": "new@example.com",
+                "monthly_base_rate": "1200.00",
+                "additional_hourly_rate": "60.00",
+            },
+        )
+
+        self.assertRedirects(response, reverse("coaches:admin-coaches"))
+        self.assertFalse(CoachMonthlyPayroll.objects.filter(coach=coach, month=previous_month).exists())
+        self.assertEqual(
+            list(
+                CoachMonthlyPayroll.objects.filter(coach=coach)
+                .order_by("month")
+                .values_list("month", "base_rate_snapshot")
+            ),
+            [(current_month, Decimal("1200.00")), (future_month, Decimal("1200.00"))],
+        )

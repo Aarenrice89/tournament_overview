@@ -6,7 +6,12 @@ from django.db import transaction
 from django.forms import BaseInlineFormSet, inlineformset_factory
 
 from .models import AdditionalWork, CoachInvitation, CoachProfile, PrivateLesson
-from .services import PRIVATE_LESSON_RATES, central_today, prepare_work
+from .services import (
+    PRIVATE_LESSON_RATES,
+    central_today,
+    initialize_current_and_future_payrolls_for_coach,
+    prepare_work,
+)
 
 
 class BootstrapFormMixin:
@@ -101,6 +106,7 @@ class CoachEditForm(BootstrapFormMixin, forms.Form):
         self.coach.monthly_base_rate = self.cleaned_data["monthly_base_rate"]
         self.coach.additional_hourly_rate = self.cleaned_data["additional_hourly_rate"]
         self.coach.save(update_fields=["monthly_base_rate", "additional_hourly_rate", "updated_at"])
+        initialize_current_and_future_payrolls_for_coach(self.coach)
         return self.coach
 
 
