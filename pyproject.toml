@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "tournament-overview"
 version = "0.1.0"
-description = ""
+description = "Mid TN VB Club Coaches Portal"
 authors = ["Aaren Rice"]
 
 [tool.poetry.dependencies]
