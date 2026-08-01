@@ -145,7 +145,7 @@ def send_invitation_email(invitation):
     send_mail(
         subject="Complete your coach portal registration",
         message=(
-            "You have been invited to the coach portal. Complete your registration within seven days:\n\n"
+            "You have been invited to the Mid TN VBC coaches portal. Complete your registration within seven days:\n\n"
             f"{registration_url}"
         ),
         from_email=settings.DEFAULT_FROM_EMAIL,

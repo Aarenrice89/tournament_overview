@@ -24,7 +24,10 @@ class CoachInvitationTests(TestCase):
         self.assertRedirects(response, reverse("coaches:admin-invitations"))
         self.assertEqual(invitation.email, "coach@example.com")
         self.assertEqual(len(mail.outbox), 1)
-        self.assertIn(str(invitation.token), mail.outbox[0].body)
+        self.assertIn(
+            f"https://club.example/coaches/invitations/{invitation.token}/register/",
+            mail.outbox[0].body,
+        )
 
     def test_registration_consumes_invitation_and_creates_coach_profile(self):
         invitation = CoachInvitation.objects.create(email="coach@example.com")

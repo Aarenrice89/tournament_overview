@@ -11,6 +11,7 @@
 - `TournamentRegistration` is the tournament-team join model. Its database constraints enforce one registration per tournament/team and the registered -> paid -> rosters status progression.
 - `registration_opens_date`, `registration_closes_date`, and `end_date` may be `NULL`; preserve unknown dates instead of inventing values.
 - Coach invitation emails use SMTP and `SITE_URL`; configure Google Workspace credentials and `DEFAULT_FROM_EMAIL` outside version control. Payroll and work-item rate snapshots must not be rewritten when current coach rates change. A paid `PayrollMonth` locks coach work changes for every coach; only staff may correct paid-month work.
+- Initialize each new Central Time payroll month with `poetry run python manage.py initialize_current_payroll_month`; the command is idempotent for the Droplet cron job.
 
 # Data Import
 

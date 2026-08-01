@@ -39,3 +39,53 @@ After the initial setup, a push to `main` publishes `:production` and an immutab
 The API startup command applies Django migrations and collects static files before starting Gunicorn. Keep schema migrations backward-compatible for automatic rollout. For destructive or non-reversible migrations, take a database backup and temporarily perform a controlled manual deployment instead.
 
 Compose, Caddyfile, and environment-file changes are not deployed by Watchtower. Update those files on the Droplet and rerun `docker compose ... up -d` when they change.
+
+## Monthly Payroll Initialization
+
+Use the `initialize_current_payroll_month` command to initialize the current Central Time month. It is idempotent and can safely run more than once:
+
+```bash
+docker compose --env-file compose/envs/.env.production -f compose/docker-compose.production.yml exec -T api python manage.py initialize_current_payroll_month
+```
+
+Use a systemd timer on the Droplet to run the command at midnight Central Time on the first of every month. Unlike cron, `Persistent=true` runs a missed task after the Droplet returns online.
+
+Create `/etc/systemd/system/midtnvbc-payroll-init.service`, replacing `/opt/midtnvbc` with the directory containing the Compose files:
+
+```ini
+[Unit]
+Description=Initialize current coach payroll month
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/midtnvbc
+ExecStart=/usr/bin/docker compose --env-file compose/envs/.env.production -f compose/docker-compose.production.yml exec -T api python manage.py initialize_current_payroll_month
+```
+
+Create `/etc/systemd/system/midtnvbc-payroll-init.timer`:
+
+```ini
+[Unit]
+Description=Initialize coach payroll monthly
+
+[Timer]
+OnCalendar=*-*-01 00:00:00 America/Chicago
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+```
+
+Enable the timer:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now midtnvbc-payroll-init.timer
+```
+
+Check its next scheduled run and inspect execution logs with:
+
+```bash
+systemctl list-timers midtnvbc-payroll-init.timer
+journalctl -u midtnvbc-payroll-init.service
+```
