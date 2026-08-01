@@ -27,7 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 
-SUPER_USER_PASSWORD = env("SUPER_USER_PASSWORD", default="password")
+SUPER_USER_PASSWORD = env("SUPER_USER_PASSWORD")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool("DEBUG", default=False)
