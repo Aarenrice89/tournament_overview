@@ -1,0 +1,9 @@
+[Unit]
+Description=Back up the Mid TN VBC PostgreSQL database to S3
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/tournament_overview
+ExecStart=/usr/bin/flock -n /var/lock/midtnvbc-database-backup.lock /usr/bin/docker compose --env-file compose/envs/.env.production -f compose/docker-compose.production.yml run --rm --no-deps api python manage.py backup_database

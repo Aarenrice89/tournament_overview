@@ -75,6 +75,32 @@ class TournamentViewTests(TestCase):
         self.assertContains(response, reverse("landing"))
         self.assertContains(response, "portal-header--admin")
 
+    def test_overview_filters_tournaments_by_search_query(self):
+        Tournament.objects.create(
+            name="Summer Open",
+            start_date=date(2026, 6, 10),
+            end_date=date(2026, 6, 12),
+            location="Dallas, TX",
+            registration_opens_date=date(2026, 2, 10),
+            registration_closes_date=date(2026, 5, 10),
+        )
+        self.client.force_login(self.staff_user)
+
+        response = self.client.get(reverse("tournaments:list"), {"q": "summer"})
+
+        self.assertContains(response, "Summer Open")
+        self.assertNotContains(response, "Spring Classic")
+
+    def test_overview_returns_results_fragment_for_async_search(self):
+        self.client.force_login(self.staff_user)
+
+        response = self.client.get(
+            reverse("tournaments:list"), {"q": "spring"}, HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+
+        self.assertContains(response, "Spring Classic")
+        self.assertNotContains(response, "Tournament overview")
+
     def test_staff_can_create_a_tournament(self):
         self.client.force_login(self.staff_user)
 

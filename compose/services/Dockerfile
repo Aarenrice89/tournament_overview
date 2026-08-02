@@ -10,8 +10,12 @@ ARG USER_GID=$USER_UID
 RUN groupadd --gid $USER_GID $USERNAME && \
   useradd --uid $USER_UID --gid $USER_GID -m $USERNAME && \
   # install packages
-  apt-get update && \
-  apt-get install -y sudo curl && \
+   apt-get update && \
+   apt-get install -y sudo curl ca-certificates gnupg && \
+   curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor -o /usr/share/keyrings/postgresql.gpg && \
+   echo "deb [signed-by=/usr/share/keyrings/postgresql.gpg] https://apt.postgresql.org/pub/repos/apt bullseye-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
+   apt-get update && \
+   apt-get install -y postgresql-client-16 && \
   rm -rf /var/lib/apt/lists/* && \
   # add user to sudoers
   echo $USERNAME  ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME && \

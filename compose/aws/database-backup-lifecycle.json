@@ -1,0 +1,34 @@
+{
+  "Rules": [
+    {
+      "ID": "Expire daily database backups",
+      "Filter": { "Prefix": "postgres/daily/" },
+      "Status": "Enabled",
+      "Expiration": { "Days": 30 }
+    },
+    {
+      "ID": "Expire weekly database backups",
+      "Filter": { "Prefix": "postgres/weekly/" },
+      "Status": "Enabled",
+      "Expiration": { "Days": 91 }
+    },
+    {
+      "ID": "Expire monthly database backups",
+      "Filter": { "Prefix": "postgres/monthly/" },
+      "Status": "Enabled",
+      "Expiration": { "Days": 730 }
+    },
+    {
+      "ID": "Expire yearly database backups",
+      "Filter": { "Prefix": "postgres/yearly/" },
+      "Status": "Enabled",
+      "Expiration": { "Days": 2555 }
+    },
+    {
+      "ID": "Expire emergency pre-restore backups",
+      "Filter": { "Prefix": "postgres/pre-restore/" },
+      "Status": "Enabled",
+      "Expiration": { "Days": 30 }
+    }
+  ]
+}

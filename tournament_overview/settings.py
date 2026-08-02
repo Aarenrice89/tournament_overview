@@ -103,6 +103,12 @@ DATABASES = {
     }
 }
 
+# Database backups
+AWS_REGION = env("AWS_REGION", default="")
+DATABASE_BACKUP_S3_BUCKET = env("DATABASE_BACKUP_S3_BUCKET", default="")
+DATABASE_BACKUP_S3_PREFIX = env("DATABASE_BACKUP_S3_PREFIX", default="postgres")
+DATABASE_BACKUP_S3_KMS_KEY_ID = env("DATABASE_BACKUP_S3_KMS_KEY_ID", default="")
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators

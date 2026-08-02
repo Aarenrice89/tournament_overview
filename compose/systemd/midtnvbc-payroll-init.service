@@ -1,0 +1,7 @@
+[Unit]
+Description=Initialize current coach payroll month
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/tournament_overview
+ExecStart=/usr/bin/docker compose --env-file compose/envs/.env.production -f compose/docker-compose.production.yml exec -T api python manage.py initialize_current_payroll_month

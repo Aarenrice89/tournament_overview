@@ -89,3 +89,62 @@ Check its next scheduled run and inspect execution logs with:
 systemctl list-timers midtnvbc-payroll-init.timer
 journalctl -u midtnvbc-payroll-init.service
 ```
+
+## Database Backups
+
+Database backups use PostgreSQL custom archives uploaded to AWS S3. Provision a private S3 bucket before enabling
+the job. Enable bucket versioning, default encryption, and Object Lock when creating the bucket. Use S3 lifecycle
+rules for the following prefixes. The ready-to-apply lifecycle configuration is at
+`compose/aws/database-backup-lifecycle.json`; replace the bucket placeholder in
+`compose/aws/database-backup-iam-policy.json` before assigning it to the server's IAM principal.
+
+| Prefix | Retention |
+| --- | --- |
+| `postgres/daily/` | 30 days |
+| `postgres/weekly/` | 13 weeks |
+| `postgres/monthly/` | 24 months |
+| `postgres/yearly/` | 7 years |
+| `postgres/pre-restore/` | 30 days |
+| `postgres/known-good/` | Manual review; no automatic expiry |
+
+The backup command creates daily archives and copies the first successful archive of each Central Time week, month,
+and year into the corresponding retention prefix. S3 lifecycle policies, rather than the application, expire old
+archives. Configure the `AWS_REGION`, `DATABASE_BACKUP_S3_BUCKET`, `DATABASE_BACKUP_S3_PREFIX`, and, if used,
+`DATABASE_BACKUP_S3_KMS_KEY_ID` values in `compose/envs/.env.production`. Provide the API container with AWS
+credentials restricted to this bucket; do not commit those credentials.
+
+Install the committed systemd unit files, replacing `/opt/midtnvbc` with the directory containing the Compose files:
+
+```bash
+sudo cp compose/systemd/midtnvbc-database-backup.service /etc/systemd/system/
+sudo cp compose/systemd/midtnvbc-database-backup.timer /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now midtnvbc-database-backup.timer
+```
+
+The timer runs at midnight Central Time and uses `Persistent=true` to run a missed backup after the host returns.
+Run a backup manually or inspect the timer with:
+
+```bash
+docker compose --env-file compose/envs/.env.production -f compose/docker-compose.production.yml run --rm --no-deps api python manage.py backup_database
+systemctl list-timers midtnvbc-database-backup.timer
+journalctl -u midtnvbc-database-backup.service
+```
+
+Promote a verified archive after an important import, reconciliation, or other trusted milestone. Known-good
+archives are not subject to normal expiration:
+
+```bash
+docker compose --env-file compose/envs/.env.production -f compose/docker-compose.production.yml run --rm --no-deps api python manage.py promote_database_backup postgres/monthly/2026/08/01/tournament_overview-20260801T050000Z.dump
+```
+
+Restoring replaces the live database. Run it only from the host with the committed wrapper, which stops the API,
+creates an emergency pre-restore backup, verifies the selected archive checksum, restores it, and starts the API
+again only after success:
+
+```bash
+sudo bash compose/services/restore-database.sh postgres/known-good/2026/08/01/tournament_overview-20260801T050000Z.dump
+```
+
+If a restore fails, the wrapper leaves the API stopped to avoid serving a partially restored database. Test a restore
+to an isolated PostgreSQL database at least monthly.
