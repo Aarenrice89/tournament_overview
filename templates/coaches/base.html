@@ -23,9 +23,9 @@
           <a class="nav-link" href="{% url 'coaches:dashboard' %}">Coach Payroll</a>
         {% endif %}
         {% if user.is_authenticated %}
-          <form method="post" action="{% url 'coaches:logout' %}">
+          <form class="ms-2" method="post" action="{% url 'coaches:logout' %}">
             {% csrf_token %}
-            <button class="btn btn-link nav-link" type="submit">Log out</button>
+            <button class="btn btn-outline-light" type="submit">Log out</button>
           </form>
         {% endif %}
       </div>

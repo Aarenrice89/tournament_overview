@@ -33,7 +33,10 @@
         <div class="navbar-nav ms-auto">
           <a class="nav-link" href="{% url 'tournaments:list' %}">Tournament Overview</a>
           <a class="nav-link" href="{% url 'tournaments:team-list' %}">Teams</a>
-          <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
+          <form class="ms-2" method="post" action="{% url 'coaches:logout' %}">
+            {% csrf_token %}
+            <button class="btn btn-outline-light" type="submit">Log out</button>
+          </form>
         </div>
       </div>
     </nav>

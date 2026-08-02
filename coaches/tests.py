@@ -244,6 +244,10 @@ class PortalRenderingTests(TestCase):
         self.assertContains(response, "Monthly coach payroll")
         self.assertContains(response, reverse("landing"))
         self.assertContains(response, "portal-header--admin")
+        self.assertContains(response, "Payroll Admin")
+        self.assertContains(response, "Coaches")
+        self.assertContains(response, "Invitations")
+        self.assertContains(response, 'class="btn btn-outline-light" type="submit">Log out</button>')
 
 
 class StaffCoachEditTests(TestCase):

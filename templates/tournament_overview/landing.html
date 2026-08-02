@@ -11,7 +11,7 @@
 </head>
 <body class="portal-body">
   <header class="navbar navbar-expand portal-header {% if user.is_staff or not user.is_authenticated %}portal-header--admin{% else %}portal-header--coach{% endif %}">
-    <div class="container"><a class="navbar-brand" href="{% url 'landing' %}"><img class="portal-logo" src="{% static 'tournament_overview/images/mtnvbc-logo.png' %}" alt="Mid TN Volleyball Club"><span class="portal-title">{% if user.is_staff %}Admin Portal{% else %}Coaches Portal{% endif %}</span></a>{% if user.is_authenticated %}<form method="post" action="{% url 'coaches:logout' %}">{% csrf_token %}<button class="btn btn-outline-light">Log out</button></form>{% endif %}</div>
+    <div class="container"><a class="navbar-brand" href="{% url 'landing' %}"><img class="portal-logo" src="{% static 'tournament_overview/images/mtnvbc-logo.png' %}" alt="Mid TN Volleyball Club"><span class="portal-title">{% if user.is_staff %}Admin Portal{% else %}Coaches Portal{% endif %}</span></a>{% if user.is_authenticated %}<div class="navbar-nav ms-auto">{% if user.is_staff %}<a class="nav-link" href="{% url 'admin:index' %}">Admin</a>{% endif %}<form class="ms-2" method="post" action="{% url 'coaches:logout' %}">{% csrf_token %}<button class="btn btn-outline-light">Log out</button></form></div>{% endif %}</div>
   </header>
   <main class="container py-5">
     <div class="mb-5"><h1 class="display-6 mb-2">Welcome{% if user.is_authenticated and user.get_full_name %}, {{ user.get_full_name }}{% endif %}</h1><p class="lead text-muted mb-0">Choose an application to continue.</p></div>

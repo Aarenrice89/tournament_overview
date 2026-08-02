@@ -27,6 +27,8 @@ class PortalLandingTests(TestCase):
         self.assertContains(response, "Payroll Admin")
         self.assertNotContains(response, "Coach Payroll")
         self.assertContains(response, "portal-header--admin")
+        self.assertContains(response, reverse("admin:index"))
+        self.assertContains(response, 'class="btn btn-outline-light">Log out</button>')
 
     def test_coach_sees_coach_payroll(self):
         user = get_user_model().objects.create_user(username="coach", password="password")

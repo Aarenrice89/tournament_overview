@@ -74,6 +74,10 @@ class TournamentViewTests(TestCase):
         self.assertContains(response, "Registered + paid + rosters")
         self.assertContains(response, reverse("landing"))
         self.assertContains(response, "portal-header--admin")
+        self.assertContains(response, "Tournament Overview")
+        self.assertContains(response, "Teams")
+        self.assertNotContains(response, f'href="{reverse("admin:index")}"')
+        self.assertContains(response, 'class="btn btn-outline-light" type="submit">Log out</button>')
 
     def test_overview_filters_tournaments_by_search_query(self):
         Tournament.objects.create(
