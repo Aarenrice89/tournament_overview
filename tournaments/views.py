@@ -28,6 +28,11 @@ class TournamentListView(StaffRequiredMixin, ListView):
     context_object_name = "tournaments"
     template_name = "tournaments/tournament_list.html"
 
+    def get_template_names(self):
+        if self.request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return ["tournaments/_tournament_results.html"]
+        return [self.template_name]
+
     def get_queryset(self):
         registrations = (
             TournamentRegistration.objects.select_related("team")

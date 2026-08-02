@@ -1,0 +1,10 @@
+[Unit]
+Description=Run the Mid TN VBC database backup at midnight Central Time
+
+[Timer]
+OnCalendar=*-*-* 00:00:00 America/Chicago
+Persistent=true
+Unit=midtnvbc-database-backup.service
+
+[Install]
+WantedBy=timers.target
