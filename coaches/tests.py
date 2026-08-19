@@ -1,5 +1,6 @@
 from datetime import timedelta
 from decimal import Decimal
+from unittest.mock import patch
 from uuid import uuid4
 
 from django.contrib.auth import get_user_model
@@ -41,6 +42,31 @@ class CoachInvitationTests(TestCase):
             f"https://club.example/coaches/invitations/{invitation.token}/register/",
             mail.outbox[0].body,
         )
+
+    def test_staff_invitation_is_not_created_when_email_delivery_fails(self):
+        staff = get_user_model().objects.create_user(username="admin", password="password", is_staff=True)
+        self.client.force_login(staff)
+
+        with patch("coaches.views.send_invitation_email", side_effect=OSError("SMTP unavailable")):
+            response = self.client.post(reverse("coaches:admin-invitation-add"), {"email": "coach@example.com"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "The invitation email could not be delivered. No invitation was created.")
+        self.assertFalse(CoachInvitation.objects.exists())
+
+    def test_staff_can_retry_an_existing_invitation_after_email_delivery_failure(self):
+        staff = get_user_model().objects.create_user(username="admin", password="password", is_staff=True)
+        invitation = CoachInvitation.objects.create(email="coach@example.com", created_by=staff)
+        self.client.force_login(staff)
+
+        with patch("coaches.views.send_invitation_email", side_effect=OSError("SMTP unavailable")):
+            response = self.client.post(
+                reverse("coaches:admin-invitation-resend", kwargs={"pk": invitation.pk}), follow=True
+            )
+
+        self.assertRedirects(response, reverse("coaches:admin-invitations"))
+        self.assertContains(response, "The invitation email could not be delivered. Please try again later.")
+        self.assertTrue(CoachInvitation.objects.filter(pk=invitation.pk).exists())
 
     def test_registration_consumes_invitation_and_creates_coach_profile(self):
         invitation = CoachInvitation.objects.create(email="coach@example.com")
