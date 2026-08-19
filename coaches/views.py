@@ -1,4 +1,6 @@
+import logging
 from datetime import date
+from smtplib import SMTPException
 
 from django.contrib import messages
 from django.contrib.auth import login
@@ -38,12 +40,15 @@ from .models import (
     PayrollMonth,
 )
 from .services import (
+    InvitationEmailDeliveryError,
     central_today,
     initialize_payroll_month,
     is_month_paid,
     recalculate_private_lesson_payment,
     send_invitation_email,
 )
+
+logger = logging.getLogger(__name__)
 
 
 def requested_month(value, allow_future=False):
@@ -298,18 +303,29 @@ class StaffInvitationCreateView(StaffRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
-        response = super().form_valid(form)
-        send_invitation_email(self.object)
+        try:
+            with transaction.atomic():
+                self.object = form.save()
+                send_invitation_email(self.object)
+        except (InvitationEmailDeliveryError, OSError, SMTPException):
+            logger.exception("Unable to deliver coach invitation email to %s", form.cleaned_data["email"])
+            form.add_error(None, "The invitation email could not be delivered. No invitation was created.")
+            return self.form_invalid(form)
         messages.success(self.request, f"Invitation created and emailed to {self.object.email}.")
-        return response
+        return redirect(self.get_success_url())
 
 
 class StaffInvitationResendView(StaffRequiredMixin, View):
     def post(self, request, pk):
         invitation = get_object_or_404(CoachInvitation, pk=pk)
         if invitation.is_valid:
-            send_invitation_email(invitation)
-            messages.success(request, f"Invitation emailed to {invitation.email}.")
+            try:
+                send_invitation_email(invitation)
+            except (InvitationEmailDeliveryError, OSError, SMTPException):
+                logger.exception("Unable to deliver coach invitation email to %s", invitation.email)
+                messages.error(request, "The invitation email could not be delivered. Please try again later.")
+            else:
+                messages.success(request, f"Invitation emailed to {invitation.email}.")
         else:
             messages.error(request, "Only active invitations can be resent.")
         return redirect("coaches:admin-invitations")

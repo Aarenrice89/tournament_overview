@@ -4,7 +4,7 @@ from zoneinfo import ZoneInfo
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.core.mail import send_mail
+from django.core.mail import get_connection, send_mail
 from django.db import transaction
 from django.urls import reverse
 from django.utils import timezone
@@ -19,6 +19,10 @@ PRIVATE_LESSON_RATES = {
     4: Decimal("115.00"),
     5: Decimal("135.00"),
 }
+
+
+class InvitationEmailDeliveryError(Exception):
+    pass
 
 
 def central_today():
@@ -163,7 +167,7 @@ def recalculate_private_lesson_payment(work):
 def send_invitation_email(invitation):
     registration_path = reverse("coaches:register", kwargs={"token": invitation.token})
     registration_url = f"{settings.SITE_URL.rstrip('/')}{registration_path}"
-    send_mail(
+    emails_sent = send_mail(
         subject="Complete your coach portal registration",
         message=(
             "You have been invited to the Mid TN VBC coaches portal. Complete your registration within seven days:\n\n"
@@ -171,4 +175,7 @@ def send_invitation_email(invitation):
         ),
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[invitation.email],
+        connection=get_connection(timeout=settings.EMAIL_TIMEOUT),
     )
+    if emails_sent != 1:
+        raise InvitationEmailDeliveryError("The invitation email was not accepted for delivery.")
