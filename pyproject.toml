@@ -18,6 +18,7 @@ djangorestframework-simplejwt = "^5.3.1"
 django-redis = "^5.4.0"
 django-axes = "^8.3.1"
 boto3 = "^1.43.62"
+resend = "^2.37.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.12.1"

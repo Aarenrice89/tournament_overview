@@ -17,7 +17,7 @@ The production API image is published to GitHub Container Registry whenever a co
    docker login ghcr.io -u <github-user> --password-stdin
    ```
 
-3. Create `compose/envs/.env.production` from the example. Set `GHCR_IMAGE` to the lowercase `<github-owner>/<repository>` path used by GHCR, and provide the existing Django, PostgreSQL, Redis, and SMTP values.
+3. Create `compose/envs/.env.production` from the example. Set `GHCR_IMAGE` to the lowercase `<github-owner>/<repository>` path used by GHCR, and provide the Django, PostgreSQL, Redis, Resend API key, verified Resend sender, and `SITE_URL` values.
 4. Keep the production Compose file, Caddyfile, and environment file on the Droplet. The environment file is not stored in Git or included in the image.
 5. Perform the initial deployment:
 
