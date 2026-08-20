@@ -1,6 +1,5 @@
 import logging
 from datetime import date
-from smtplib import SMTPException
 
 from django.contrib import messages
 from django.contrib.auth import login
@@ -307,7 +306,7 @@ class StaffInvitationCreateView(StaffRequiredMixin, CreateView):
             with transaction.atomic():
                 self.object = form.save()
                 send_invitation_email(self.object)
-        except (InvitationEmailDeliveryError, OSError, SMTPException):
+        except InvitationEmailDeliveryError:
             logger.exception("Unable to deliver coach invitation email to %s", form.cleaned_data["email"])
             form.add_error(None, "The invitation email could not be delivered. No invitation was created.")
             return self.form_invalid(form)
@@ -321,7 +320,7 @@ class StaffInvitationResendView(StaffRequiredMixin, View):
         if invitation.is_valid:
             try:
                 send_invitation_email(invitation)
-            except (InvitationEmailDeliveryError, OSError, SMTPException):
+            except InvitationEmailDeliveryError:
                 logger.exception("Unable to deliver coach invitation email to %s", invitation.email)
                 messages.error(request, "The invitation email could not be delivered. Please try again later.")
             else:

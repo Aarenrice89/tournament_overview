@@ -4,11 +4,11 @@ from unittest.mock import patch
 from uuid import uuid4
 
 from django.contrib.auth import get_user_model
-from django.core import mail
 from django.core.cache import cache
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
+from resend.exceptions import ResendError
 
 from .forms import AdditionalWorkForm
 from .models import (
@@ -20,34 +20,73 @@ from .models import (
     PrivateLesson,
 )
 from .services import (
+    InvitationEmailDeliveryError,
     central_today,
     payroll_month_for,
     recalculate_private_lesson_payment,
+    send_invitation_email,
 )
 
 
 class CoachInvitationTests(TestCase):
-    @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend", SITE_URL="https://club.example")
+    @override_settings(
+        DEFAULT_FROM_EMAIL="Mid TN VBC <coaches@club.example>",
+        RESEND_API_KEY="re_test",
+        SITE_URL="https://club.example",
+    )
     def test_staff_can_create_and_email_an_invitation(self):
         staff = get_user_model().objects.create_user(username="admin", password="password", is_staff=True)
         self.client.force_login(staff)
 
-        response = self.client.post(reverse("coaches:admin-invitation-add"), {"email": "coach@example.com"})
+        with patch("coaches.services.resend.Emails.send") as send:
+            response = self.client.post(reverse("coaches:admin-invitation-add"), {"email": "coach@example.com"})
 
         invitation = CoachInvitation.objects.get()
         self.assertRedirects(response, reverse("coaches:admin-invitations"))
         self.assertEqual(invitation.email, "coach@example.com")
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertIn(
-            f"https://club.example/coaches/invitations/{invitation.token}/register/",
-            mail.outbox[0].body,
+        send.assert_called_once_with(
+            {
+                "from": "Mid TN VBC <coaches@club.example>",
+                "to": ["coach@example.com"],
+                "subject": "Complete your coach portal registration",
+                "text": (
+                    "You have been invited to the Mid TN VBC coaches portal. "
+                    "Complete your registration within seven days:\n\n"
+                    f"https://club.example/coaches/invitations/{invitation.token}/register/"
+                ),
+            }
         )
+
+    @override_settings(RESEND_API_KEY="", SITE_URL="https://club.example")
+    def test_invitation_email_requires_a_resend_api_key(self):
+        invitation = CoachInvitation.objects.create(email="coach@example.com")
+
+        with self.assertRaisesRegex(InvitationEmailDeliveryError, "RESEND_API_KEY is not configured"):
+            send_invitation_email(invitation)
+
+    @override_settings(
+        DEFAULT_FROM_EMAIL="Mid TN VBC <coaches@club.example>",
+        RESEND_API_KEY="re_test",
+        SITE_URL="https://club.example",
+    )
+    def test_invitation_email_translates_resend_errors(self):
+        invitation = CoachInvitation.objects.create(email="coach@example.com")
+
+        with patch(
+            "coaches.services.resend.Emails.send",
+            side_effect=ResendError("validation_error", "validation_error", "Resend unavailable", "Retry later"),
+        ):
+            with self.assertRaisesRegex(InvitationEmailDeliveryError, "not accepted for delivery"):
+                send_invitation_email(invitation)
 
     def test_staff_invitation_is_not_created_when_email_delivery_fails(self):
         staff = get_user_model().objects.create_user(username="admin", password="password", is_staff=True)
         self.client.force_login(staff)
 
-        with patch("coaches.views.send_invitation_email", side_effect=OSError("SMTP unavailable")):
+        with patch(
+            "coaches.views.send_invitation_email",
+            side_effect=InvitationEmailDeliveryError("Resend unavailable"),
+        ):
             response = self.client.post(reverse("coaches:admin-invitation-add"), {"email": "coach@example.com"})
 
         self.assertEqual(response.status_code, 200)
@@ -59,7 +98,10 @@ class CoachInvitationTests(TestCase):
         invitation = CoachInvitation.objects.create(email="coach@example.com", created_by=staff)
         self.client.force_login(staff)
 
-        with patch("coaches.views.send_invitation_email", side_effect=OSError("SMTP unavailable")):
+        with patch(
+            "coaches.views.send_invitation_email",
+            side_effect=InvitationEmailDeliveryError("Resend unavailable"),
+        ):
             response = self.client.post(
                 reverse("coaches:admin-invitation-resend", kwargs={"pk": invitation.pk}), follow=True
             )

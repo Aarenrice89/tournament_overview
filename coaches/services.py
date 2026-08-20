@@ -2,12 +2,13 @@ from datetime import date
 from decimal import ROUND_HALF_UP, Decimal
 from zoneinfo import ZoneInfo
 
+import resend
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.core.mail import get_connection, send_mail
 from django.db import transaction
 from django.urls import reverse
 from django.utils import timezone
+from resend.exceptions import ResendError
 
 CENTRAL_TIME = ZoneInfo("America/Chicago")
 TO_CENTS = Decimal("0.01")
@@ -167,15 +168,21 @@ def recalculate_private_lesson_payment(work):
 def send_invitation_email(invitation):
     registration_path = reverse("coaches:register", kwargs={"token": invitation.token})
     registration_url = f"{settings.SITE_URL.rstrip('/')}{registration_path}"
-    emails_sent = send_mail(
-        subject="Complete your coach portal registration",
-        message=(
-            "You have been invited to the Mid TN VBC coaches portal. Complete your registration within seven days:\n\n"
-            f"{registration_url}"
-        ),
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[invitation.email],
-        connection=get_connection(timeout=settings.EMAIL_TIMEOUT),
-    )
-    if emails_sent != 1:
-        raise InvitationEmailDeliveryError("The invitation email was not accepted for delivery.")
+    if not settings.RESEND_API_KEY:
+        raise InvitationEmailDeliveryError("RESEND_API_KEY is not configured.")
+    resend.api_key = settings.RESEND_API_KEY
+    try:
+        resend.Emails.send(
+            {
+                "from": settings.DEFAULT_FROM_EMAIL,
+                "to": [invitation.email],
+                "subject": "Complete your coach portal registration",
+                "text": (
+                    "You have been invited to the Mid TN VBC coaches portal. "
+                    "Complete your registration within seven days:\n\n"
+                    f"{registration_url}"
+                ),
+            }
+        )
+    except (ResendError, ValueError) as error:
+        raise InvitationEmailDeliveryError("The invitation email was not accepted for delivery.") from error

@@ -40,7 +40,7 @@ docker compose -f compose/docker-compose.yml exec api python manage.py migrate
 
 ## Coach Payroll
 
-Staff create one-week coach invitations from `/coaches/admin/invitations/`. Invitation emails use SMTP and `SITE_URL`.
+Staff create one-week coach invitations from `/coaches/admin/invitations/`. Invitation emails use Resend's API; configure `RESEND_API_KEY`, a `DEFAULT_FROM_EMAIL` sender on a verified Resend domain, and `SITE_URL` outside version control.
 
 Coach work supports hourly activities, tournaments, and private lessons. Payroll totals snapshot current rates when work or a monthly payroll record is created. Marking a `PayrollMonth` paid locks coach edits for all coaches in that month; staff can reopen the month or make corrections.
 
