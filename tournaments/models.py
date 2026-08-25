@@ -60,11 +60,20 @@ class Tournament(models.Model):
 
 
 class TournamentRegistration(models.Model):
+    class RegistrationStatus(models.TextChoices):
+        PENDING = "pending", "Pending"
+        ACCEPTED = "accepted", "Accepted"
+
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, related_name="registrations")
     team = models.ForeignKey(Team, on_delete=models.PROTECT, related_name="tournament_registrations")
     is_registered = models.BooleanField(default=False)
     is_paid = models.BooleanField(default=False)
     rosters_entered = models.BooleanField(default=False)
+    registration_status = models.CharField(
+        max_length=8,
+        choices=RegistrationStatus.choices,
+        default=RegistrationStatus.PENDING,
+    )
 
     class Meta:
         constraints = [

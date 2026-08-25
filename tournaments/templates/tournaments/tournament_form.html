@@ -73,11 +73,18 @@
               {{ registration_form.id }}
               {% if registration_form.non_field_errors %}{{ registration_form.non_field_errors }}{% endif %}
               <div class="row g-3 align-items-end">
-                <div class="col-md-4"><label class="form-label" for="{{ registration_form.team.id_for_label }}">Team</label>{{ registration_form.team }}{{ registration_form.team.errors }}</div>
-                <div class="col-md-2 form-check ms-3">{{ registration_form.is_registered }}<label class="form-check-label" for="{{ registration_form.is_registered.id_for_label }}">Registered</label>{{ registration_form.is_registered.errors }}</div>
-                <div class="col-md-2 form-check">{{ registration_form.is_paid }}<label class="form-check-label" for="{{ registration_form.is_paid.id_for_label }}">Paid</label>{{ registration_form.is_paid.errors }}</div>
-                <div class="col-md-2 form-check">{{ registration_form.rosters_entered }}<label class="form-check-label" for="{{ registration_form.rosters_entered.id_for_label }}">Rosters entered</label>{{ registration_form.rosters_entered.errors }}</div>
-                <div class="col-md-1 d-flex align-items-end">
+                <div class="col-12 col-lg-3"><label class="form-label" for="{{ registration_form.team.id_for_label }}">Team</label>{{ registration_form.team }}{{ registration_form.team.errors }}</div>
+                <div class="col-6 col-md-4 col-lg-2 form-check">{{ registration_form.is_registered }}<label class="form-check-label" for="{{ registration_form.is_registered.id_for_label }}">Registered</label>{{ registration_form.is_registered.errors }}</div>
+                <div class="col-6 col-md-4 col-lg-2 form-check">{{ registration_form.is_paid }}<label class="form-check-label" for="{{ registration_form.is_paid.id_for_label }}">Paid</label>{{ registration_form.is_paid.errors }}</div>
+                <div class="col-6 col-md-4 col-lg-2 form-check">{{ registration_form.rosters_entered }}<label class="form-check-label" for="{{ registration_form.rosters_entered.id_for_label }}">Rosters entered</label>{{ registration_form.rosters_entered.errors }}</div>
+                <div class="col-12 col-md-8 col-lg-2">
+                  <div class="form-label">Registration status</div>
+                  <div class="btn-group" role="group" aria-label="Registration status for {{ registration_form.team.value|default:'team' }}">
+                    {% for choice in registration_form.registration_status %}{{ choice.tag }}<label class="btn btn-sm btn-outline-secondary registration-status-{{ choice.data.value }}-toggle" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>{% endfor %}
+                  </div>
+                  {{ registration_form.registration_status.errors }}
+                </div>
+                <div class="col-12 col-md-4 col-lg-1 d-flex align-items-end">
                   <span class="visually-hidden">{{ registration_form.DELETE }}</span>
                   <button class="btn btn-sm btn-outline-danger" type="button" data-remove-registration title="Remove team" aria-label="Remove team">
                     <svg aria-hidden="true" fill="currentColor" height="16" viewBox="0 0 16 16" width="16"><path d="M5.5 5.5A.5.5 0 0 1 6 5h4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0V6H6v6.5a.5.5 0 0 1-1 0z"/><path d="M14.5 3a1 1 0 0 1-1 1H13l-.8 9.2A2 2 0 0 1 10.2 15H5.8a2 2 0 0 1-2-1.8L3 4h-.5a1 1 0 1 1 0-2h3a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1h3a1 1 0 0 1 1 1M4 4l.8 9.1a1 1 0 0 0 1 .9h4.4a1 1 0 0 0 1-.9L12 4zM6.5 2a.5.5 0 0 0-.5.5V3h4v-.5a.5.5 0 0 0-.5-.5z"/></svg>
@@ -91,11 +98,17 @@
           <div class="border rounded p-3 mb-3 registration-form">
             {{ formset.empty_form.id }}
             <div class="row g-3 align-items-end">
-              <div class="col-md-4"><label class="form-label" for="{{ formset.empty_form.team.id_for_label }}">Team</label>{{ formset.empty_form.team }}</div>
-              <div class="col-md-2 form-check ms-3">{{ formset.empty_form.is_registered }}<label class="form-check-label" for="{{ formset.empty_form.is_registered.id_for_label }}">Registered</label></div>
-              <div class="col-md-2 form-check">{{ formset.empty_form.is_paid }}<label class="form-check-label" for="{{ formset.empty_form.is_paid.id_for_label }}">Paid</label></div>
-              <div class="col-md-2 form-check">{{ formset.empty_form.rosters_entered }}<label class="form-check-label" for="{{ formset.empty_form.rosters_entered.id_for_label }}">Rosters entered</label></div>
-              <div class="col-md-1 d-flex align-items-end">
+              <div class="col-12 col-lg-3"><label class="form-label" for="{{ formset.empty_form.team.id_for_label }}">Team</label>{{ formset.empty_form.team }}</div>
+              <div class="col-6 col-md-4 col-lg-2 form-check">{{ formset.empty_form.is_registered }}<label class="form-check-label" for="{{ formset.empty_form.is_registered.id_for_label }}">Registered</label></div>
+              <div class="col-6 col-md-4 col-lg-2 form-check">{{ formset.empty_form.is_paid }}<label class="form-check-label" for="{{ formset.empty_form.is_paid.id_for_label }}">Paid</label></div>
+              <div class="col-6 col-md-4 col-lg-2 form-check">{{ formset.empty_form.rosters_entered }}<label class="form-check-label" for="{{ formset.empty_form.rosters_entered.id_for_label }}">Rosters entered</label></div>
+              <div class="col-12 col-md-8 col-lg-2">
+                <div class="form-label">Registration status</div>
+                <div class="btn-group" role="group" aria-label="Registration status for new team">
+                  {% for choice in formset.empty_form.registration_status %}{{ choice.tag }}<label class="btn btn-sm btn-outline-secondary registration-status-{{ choice.data.value }}-toggle" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>{% endfor %}
+                </div>
+              </div>
+              <div class="col-12 col-md-4 col-lg-1 d-flex align-items-end">
                 <span class="visually-hidden">{{ formset.empty_form.DELETE }}</span>
                 <button class="btn btn-sm btn-outline-danger" type="button" data-remove-registration title="Remove team" aria-label="Remove team">
                   <svg aria-hidden="true" fill="currentColor" height="16" viewBox="0 0 16 16" width="16"><path d="M5.5 5.5A.5.5 0 0 1 6 5h4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0V6H6v6.5a.5.5 0 0 1-1 0z"/><path d="M14.5 3a1 1 0 0 1-1 1H13l-.8 9.2A2 2 0 0 1 10.2 15H5.8a2 2 0 0 1-2-1.8L3 4h-.5a1 1 0 1 1 0-2h3a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1h3a1 1 0 0 1 1 1M4 4l.8 9.1a1 1 0 0 0 1 .9h4.4a1 1 0 0 0 1-.9L12 4zM6.5 2a.5.5 0 0 0-.5.5V3h4v-.5a.5.5 0 0 0-.5-.5z"/></svg>

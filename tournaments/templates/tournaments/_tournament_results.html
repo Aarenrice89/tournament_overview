@@ -34,9 +34,10 @@
                 {% regroup tournament.registrations.all by status_key as status_groups %}
                 {% for status_group in status_groups %}
                   <div class="team-status-group">
-                    <div class="small fw-semibold text-muted mb-1">{{ status_group.list.0.status_label }}</div>
+                    <div class="team-status-group-title fw-semibold text-muted mb-1">{{ status_group.list.0.status_label }}</div>
+                    <div class="team-line team-line-heading small text-muted"><span>Team</span><span>Registration status</span></div>
                     {% for registration in status_group.list %}
-                      <div class="team-line"><span>{{ registration.team.name }}</span><span class="status status-{{ registration.status_key }}">{{ registration.status_label }}</span></div>
+                      <div class="team-line"><span>{{ registration.team.name }}</span><span class="registration-status registration-status-{{ registration.registration_status }}">{{ registration.get_registration_status_display }}</span></div>
                     {% endfor %}
                   </div>
                 {% endfor %}
