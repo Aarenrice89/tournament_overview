@@ -18,8 +18,15 @@
       .status-registered { background: #FFF2CC; color: #735c0f; }
       .status-paid { background: #C6EFCE; color: #084298; }
       .status-complete { background: #9FC5E8; color: #0f5132; }
-      .team-line { align-items: center; display: flex; gap: .5rem; justify-content: space-between; margin-bottom: .3rem; }
+      .registration-status { border-radius: 999px; font-size: .75rem; font-weight: 700; padding: .3rem .55rem; white-space: nowrap; }
+      .registration-status-pending { background: #fff3cd; color: #664d03; }
+      .registration-status-accepted { background: #d1e7dd; color: #0f5132; }
+      .team-line { align-items: center; display: grid; gap: .35rem; grid-template-columns: minmax(8rem, 1fr) auto; margin-bottom: .3rem; }
+      .team-line-heading { border-bottom: 1px solid #e9ecef; padding-bottom: .2rem; }
+      .team-status-group-title { font-size: .95rem; }
       .team-status-group + .team-status-group { border-top: 1px solid #dee2e6; margin-top: .75rem; padding-top: .75rem; }
+      .btn-check:checked + .registration-status-pending-toggle { background: #fff3cd; border-color: #ffecb5; color: #664d03; }
+      .btn-check:checked + .registration-status-accepted-toggle { background: #d1e7dd; border-color: #badbcc; color: #0f5132; }
       fieldset { background: #fff; border: 0; border-radius: .5rem; margin-bottom: 1.25rem; padding: 1.25rem; }
       legend { color: var(--navy); font-size: 1.05rem; font-weight: 700; padding: 0 .25rem; width: auto; }
       .form-check { padding-top: 2rem; }

@@ -36,6 +36,16 @@ class TournamentModelTests(TestCase):
         with self.assertRaises(ValidationError):
             registration.full_clean()
 
+    def test_registration_status_defaults_to_pending(self):
+        tournament = self.tournament()
+        tournament.save()
+        team = Team.objects.create(name="Thunder 16U")
+
+        registration = TournamentRegistration.objects.create(tournament=tournament, team=team)
+
+        self.assertEqual(registration.registration_status, TournamentRegistration.RegistrationStatus.PENDING)
+        self.assertEqual(registration.get_registration_status_display(), "Pending")
+
 
 class TournamentViewTests(TestCase):
     def setUp(self):
@@ -72,12 +82,105 @@ class TournamentViewTests(TestCase):
         self.assertContains(response, "Spring Classic")
         self.assertContains(response, "Thunder 16U")
         self.assertContains(response, "Registered + paid + rosters")
+        self.assertContains(response, "Registration status")
+        self.assertContains(response, "Pending")
         self.assertContains(response, reverse("landing"))
         self.assertContains(response, "portal-header--admin")
         self.assertContains(response, "Tournament Overview")
         self.assertContains(response, "Teams")
         self.assertNotContains(response, f'href="{reverse("admin:index")}"')
         self.assertContains(response, 'class="btn btn-outline-light" type="submit">Log out</button>')
+
+    def test_overview_sorts_pending_before_accepted_then_by_team_name(self):
+        registrations = [
+            ("Zulu 16U", TournamentRegistration.RegistrationStatus.PENDING),
+            ("Bravo 16U", TournamentRegistration.RegistrationStatus.ACCEPTED),
+            ("Alpha 16U", TournamentRegistration.RegistrationStatus.PENDING),
+            ("Able 16U", TournamentRegistration.RegistrationStatus.ACCEPTED),
+        ]
+        for team_name, registration_status in registrations:
+            TournamentRegistration.objects.create(
+                tournament=self.tournament,
+                team=Team.objects.create(name=team_name),
+                registration_status=registration_status,
+            )
+        self.client.force_login(self.staff_user)
+
+        response = self.client.get(reverse("tournaments:list"))
+
+        content = response.content.decode()
+        positions = [content.index(team_name) for team_name in ["Alpha 16U", "Zulu 16U", "Able 16U", "Bravo 16U"]]
+        self.assertEqual(positions, sorted(positions))
+
+    def test_overview_keeps_readiness_as_the_primary_registration_sort(self):
+        accepted_team = Team.objects.create(name="Accepted 16U")
+        pending_team = Team.objects.create(name="Pending 16U")
+        TournamentRegistration.objects.create(
+            tournament=self.tournament,
+            team=accepted_team,
+            registration_status=TournamentRegistration.RegistrationStatus.ACCEPTED,
+        )
+        TournamentRegistration.objects.create(
+            tournament=self.tournament,
+            team=pending_team,
+            is_registered=True,
+            registration_status=TournamentRegistration.RegistrationStatus.PENDING,
+        )
+        self.client.force_login(self.staff_user)
+
+        response = self.client.get(reverse("tournaments:list"))
+
+        content = response.content.decode()
+        self.assertLess(content.index("Accepted 16U"), content.index("Pending 16U"))
+
+    def test_staff_can_change_registration_status_from_tournament_form(self):
+        team = Team.objects.create(name="Thunder 16U")
+        registration = TournamentRegistration.objects.create(tournament=self.tournament, team=team)
+        self.client.force_login(self.staff_user)
+
+        detail_response = self.client.get(reverse("tournaments:detail", kwargs={"pk": self.tournament.pk}))
+
+        self.assertContains(detail_response, "Registration status")
+        self.assertContains(detail_response, 'name="registrations-0-registration_status"', count=2)
+        self.assertContains(detail_response, 'class="btn-check"')
+
+        response = self.client.post(
+            reverse("tournaments:detail", kwargs={"pk": self.tournament.pk}),
+            {
+                "name": self.tournament.name,
+                "start_date": self.tournament.start_date.isoformat(),
+                "end_date": self.tournament.end_date.isoformat(),
+                "location": self.tournament.location,
+                "registration_opens_date": self.tournament.registration_opens_date.isoformat(),
+                "registration_closes_date": self.tournament.registration_closes_date.isoformat(),
+                "registration_link": "",
+                "cost_per_team": "0.00",
+                "organizing_company": "",
+                "team_minimum": "0",
+                "stay_to_play_link": "",
+                "stay_to_play_notes": "",
+                "coach_hotel": "",
+                "hotel_location": "",
+                "number_of_rooms": "0",
+                "cost_per_room": "0.00",
+                "coaches_notes": "",
+                "travel": "",
+                "flight_number": "",
+                "number_of_coaches": "0",
+                "travel_notes": "",
+                "registrations-TOTAL_FORMS": "1",
+                "registrations-INITIAL_FORMS": "1",
+                "registrations-MIN_NUM_FORMS": "0",
+                "registrations-MAX_NUM_FORMS": "1000",
+                "registrations-0-id": str(registration.pk),
+                "registrations-0-team": str(team.pk),
+                "registrations-0-registration_status": TournamentRegistration.RegistrationStatus.ACCEPTED,
+            },
+        )
+
+        self.assertRedirects(response, reverse("tournaments:list"))
+        registration.refresh_from_db()
+        self.assertEqual(registration.registration_status, TournamentRegistration.RegistrationStatus.ACCEPTED)
 
     def test_overview_filters_tournaments_by_search_query(self):
         Tournament.objects.create(

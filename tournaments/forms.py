@@ -9,6 +9,8 @@ class BootstrapFormMixin:
         for field in self.fields.values():
             if isinstance(field.widget, forms.CheckboxInput):
                 field.widget.attrs["class"] = "form-check-input"
+            elif isinstance(field.widget, forms.RadioSelect):
+                field.widget.attrs["class"] = "btn-check"
             elif isinstance(field.widget, forms.Select):
                 field.widget.attrs["class"] = "form-select"
             else:
@@ -69,7 +71,10 @@ class TeamForm(BootstrapFormMixin, forms.ModelForm):
 class TournamentRegistrationForm(BootstrapFormMixin, forms.ModelForm):
     class Meta:
         model = TournamentRegistration
-        fields = ["team", "is_registered", "is_paid", "rosters_entered"]
+        fields = ["team", "is_registered", "is_paid", "rosters_entered", "registration_status"]
+        widgets = {
+            "registration_status": forms.RadioSelect(attrs={"class": "btn-check"}),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

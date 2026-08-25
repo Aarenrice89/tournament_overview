@@ -43,9 +43,14 @@ class TournamentListView(StaffRequiredMixin, ListView):
                     When(is_registered=True, then=Value(1)),
                     default=Value(0),
                     output_field=IntegerField(),
-                )
+                ),
+                registration_status_order=Case(
+                    When(registration_status=TournamentRegistration.RegistrationStatus.PENDING, then=Value(0)),
+                    default=Value(1),
+                    output_field=IntegerField(),
+                ),
             )
-            .order_by("status_order", "team__name")
+            .order_by("status_order", "registration_status_order", "team__name")
         )
         tournaments = Tournament.objects.prefetch_related(Prefetch("registrations", queryset=registrations))
         search_query = self.request.GET.get("q", "").strip()
