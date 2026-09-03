@@ -28,6 +28,7 @@ from .services import (
 )
 
 
+@override_settings(SECURE_SSL_REDIRECT=False, SESSION_COOKIE_SECURE=False, CSRF_COOKIE_SECURE=False)
 class CoachInvitationTests(TestCase):
     @override_settings(
         DEFAULT_FROM_EMAIL="Mid TN VBC <coaches@club.example>",
@@ -195,6 +196,7 @@ class LoginThrottlingTests(TestCase):
             self.assertEqual(response.status_code, 200)
 
 
+@override_settings(SECURE_SSL_REDIRECT=False, SESSION_COOKIE_SECURE=False, CSRF_COOKIE_SECURE=False)
 class CompensationTests(TestCase):
     def setUp(self):
         user = get_user_model().objects.create_user(username="coach", password="password")
@@ -295,6 +297,7 @@ class CompensationTests(TestCase):
         self.assertEqual(work.payment_amount, Decimal("180.00"))
 
 
+@override_settings(SECURE_SSL_REDIRECT=False, SESSION_COOKIE_SECURE=False, CSRF_COOKIE_SECURE=False)
 class PortalRenderingTests(TestCase):
     def test_staff_payroll_page_renders(self):
         staff = get_user_model().objects.create_user(username="admin", password="password", is_staff=True)
@@ -317,7 +320,26 @@ class PortalRenderingTests(TestCase):
         self.assertContains(response, "Invitations")
         self.assertContains(response, 'class="btn btn-outline-light" type="submit">Log out</button>')
 
+    def test_staff_payroll_page_explains_missing_base_pay_snapshots(self):
+        staff = get_user_model().objects.create_user(username="admin", password="password", is_staff=True)
+        month = payroll_month_for(central_today())
+        PayrollMonth.objects.create(month=month, initialized_at=timezone.now())
+        CoachProfile.objects.create(user=get_user_model().objects.create_user(username="no-base-rate"))
+        CoachProfile.objects.create(
+            user=get_user_model().objects.create_user(username="missing-snapshot"),
+            monthly_base_rate=Decimal("1000.00"),
+            additional_hourly_rate=Decimal("50.00"),
+        )
+        self.client.force_login(staff)
 
+        response = self.client.get(reverse("coaches:admin-payroll"))
+
+        self.assertContains(response, "Initialized")
+        self.assertContains(response, "Base pay not set")
+        self.assertContains(response, "Base pay not initialized for this month")
+
+
+@override_settings(SECURE_SSL_REDIRECT=False, SESSION_COOKIE_SECURE=False, CSRF_COOKIE_SECURE=False)
 class StaffCoachEditTests(TestCase):
     def test_staff_can_edit_a_coach_and_return_to_the_payroll_month(self):
         staff = get_user_model().objects.create_user(username="admin", password="password", is_staff=True)
