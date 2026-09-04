@@ -45,8 +45,9 @@ class TournamentListView(StaffRequiredMixin, ListView):
                     output_field=IntegerField(),
                 ),
                 registration_status_order=Case(
-                    When(registration_status=TournamentRegistration.RegistrationStatus.PENDING, then=Value(0)),
-                    default=Value(1),
+                    When(registration_status=TournamentRegistration.RegistrationStatus.NOT_APPLICABLE, then=Value(0)),
+                    When(registration_status=TournamentRegistration.RegistrationStatus.PENDING, then=Value(1)),
+                    default=Value(2),
                     output_field=IntegerField(),
                 ),
             )

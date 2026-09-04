@@ -42,6 +42,8 @@
         <div class="col-12"><label class="form-label" for="{{ form.stay_to_play_notes.id_for_label }}">{{ form.stay_to_play_notes.label }}</label>{{ form.stay_to_play_notes }}{{ form.stay_to_play_notes.errors }}</div>
         <div class="col-md-6"><label class="form-label" for="{{ form.coach_hotel.id_for_label }}">{{ form.coach_hotel.label }}</label>{{ form.coach_hotel }}{{ form.coach_hotel.errors }}</div>
         <div class="col-md-6"><label class="form-label" for="{{ form.hotel_location.id_for_label }}">{{ form.hotel_location.label }}</label>{{ form.hotel_location }}{{ form.hotel_location.errors }}</div>
+        <div class="col-md-6"><label class="form-label" for="{{ form.hotel_open_date.id_for_label }}">{{ form.hotel_open_date.label }}</label>{{ form.hotel_open_date }}{{ form.hotel_open_date.errors }}</div>
+        <div class="col-md-6"><label class="form-label" for="{{ form.hotel_close_date.id_for_label }}">{{ form.hotel_close_date.label }}</label>{{ form.hotel_close_date }}{{ form.hotel_close_date.errors }}</div>
         <div class="col-md-6"><label class="form-label" for="{{ form.number_of_rooms.id_for_label }}">{{ form.number_of_rooms.label }}</label>{{ form.number_of_rooms }}{{ form.number_of_rooms.errors }}</div>
         <div class="col-md-6"><label class="form-label" for="{{ form.cost_per_room.id_for_label }}">{{ form.cost_per_room.label }}</label>{{ form.cost_per_room }}{{ form.cost_per_room.errors }}</div>
         <div class="col-12"><label class="form-label" for="{{ form.coaches_notes.id_for_label }}">{{ form.coaches_notes.label }}</label>{{ form.coaches_notes }}{{ form.coaches_notes.errors }}</div>
@@ -72,11 +74,21 @@
             <div class="border rounded p-3 mb-3 registration-form">
               {{ registration_form.id }}
               {% if registration_form.non_field_errors %}{{ registration_form.non_field_errors }}{% endif %}
-              <div class="row g-3 align-items-end">
+              <div class="row g-3 align-items-start">
                 <div class="col-12 col-lg-3"><label class="form-label" for="{{ registration_form.team.id_for_label }}">Team</label>{{ registration_form.team }}{{ registration_form.team.errors }}</div>
-                <div class="col-6 col-md-4 col-lg-2 form-check">{{ registration_form.is_registered }}<label class="form-check-label" for="{{ registration_form.is_registered.id_for_label }}">Registered</label>{{ registration_form.is_registered.errors }}</div>
-                <div class="col-6 col-md-4 col-lg-2 form-check">{{ registration_form.is_paid }}<label class="form-check-label" for="{{ registration_form.is_paid.id_for_label }}">Paid</label>{{ registration_form.is_paid.errors }}</div>
-                <div class="col-6 col-md-4 col-lg-2 form-check">{{ registration_form.rosters_entered }}<label class="form-check-label" for="{{ registration_form.rosters_entered.id_for_label }}">Rosters entered</label>{{ registration_form.rosters_entered.errors }}</div>
+                <div class="col-6 col-md-4 col-lg-2">
+                  <div class="form-label">Registration</div>
+                  <div class="form-check">{{ registration_form.is_registered }}<label class="form-check-label" for="{{ registration_form.is_registered.id_for_label }}">Registered</label></div>
+                  <div class="form-check">{{ registration_form.is_paid }}<label class="form-check-label" for="{{ registration_form.is_paid.id_for_label }}">Paid</label></div>
+                  <div class="form-check">{{ registration_form.rosters_entered }}<label class="form-check-label" for="{{ registration_form.rosters_entered.id_for_label }}">Rosters entered</label></div>
+                  {{ registration_form.is_registered.errors }}{{ registration_form.is_paid.errors }}{{ registration_form.rosters_entered.errors }}
+                </div>
+                <div class="col-6 col-md-4 col-lg-2">
+                  <div class="form-label">Hotel status</div>
+                  <div class="form-check">{{ registration_form.hotel_compliant }}<label class="form-check-label" for="{{ registration_form.hotel_compliant.id_for_label }}">Compliant</label></div>
+                  {{ registration_form.hotel_compliant.errors }}
+                </div>
+                <div class="col-6 col-md-4 col-lg-2"><label class="form-label" for="{{ registration_form.number_of_rooms_required.id_for_label }}">Number rooms req'd</label>{{ registration_form.number_of_rooms_required }}{{ registration_form.number_of_rooms_required.errors }}</div>
                 <div class="col-12 col-md-8 col-lg-2">
                   <div class="form-label">Registration status</div>
                   <div class="btn-group" role="group" aria-label="Registration status for {{ registration_form.team.value|default:'team' }}">
@@ -84,7 +96,7 @@
                   </div>
                   {{ registration_form.registration_status.errors }}
                 </div>
-                <div class="col-12 col-md-4 col-lg-1 d-flex align-items-end">
+                <div class="col-12 col-md-4 col-lg-1 d-flex align-self-end">
                   <span class="visually-hidden">{{ registration_form.DELETE }}</span>
                   <button class="btn btn-sm btn-outline-danger" type="button" data-remove-registration title="Remove team" aria-label="Remove team">
                     <svg aria-hidden="true" fill="currentColor" height="16" viewBox="0 0 16 16" width="16"><path d="M5.5 5.5A.5.5 0 0 1 6 5h4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0V6H6v6.5a.5.5 0 0 1-1 0z"/><path d="M14.5 3a1 1 0 0 1-1 1H13l-.8 9.2A2 2 0 0 1 10.2 15H5.8a2 2 0 0 1-2-1.8L3 4h-.5a1 1 0 1 1 0-2h3a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1h3a1 1 0 0 1 1 1M4 4l.8 9.1a1 1 0 0 0 1 .9h4.4a1 1 0 0 0 1-.9L12 4zM6.5 2a.5.5 0 0 0-.5.5V3h4v-.5a.5.5 0 0 0-.5-.5z"/></svg>
@@ -97,18 +109,26 @@
         <template id="empty-registration-form">
           <div class="border rounded p-3 mb-3 registration-form">
             {{ formset.empty_form.id }}
-            <div class="row g-3 align-items-end">
-              <div class="col-12 col-lg-3"><label class="form-label" for="{{ formset.empty_form.team.id_for_label }}">Team</label>{{ formset.empty_form.team }}</div>
-              <div class="col-6 col-md-4 col-lg-2 form-check">{{ formset.empty_form.is_registered }}<label class="form-check-label" for="{{ formset.empty_form.is_registered.id_for_label }}">Registered</label></div>
-              <div class="col-6 col-md-4 col-lg-2 form-check">{{ formset.empty_form.is_paid }}<label class="form-check-label" for="{{ formset.empty_form.is_paid.id_for_label }}">Paid</label></div>
-              <div class="col-6 col-md-4 col-lg-2 form-check">{{ formset.empty_form.rosters_entered }}<label class="form-check-label" for="{{ formset.empty_form.rosters_entered.id_for_label }}">Rosters entered</label></div>
-              <div class="col-12 col-md-8 col-lg-2">
+              <div class="row g-3 align-items-start">
+                <div class="col-12 col-lg-3"><label class="form-label" for="{{ formset.empty_form.team.id_for_label }}">Team</label>{{ formset.empty_form.team }}</div>
+                <div class="col-6 col-md-4 col-lg-2">
+                  <div class="form-label">Registration</div>
+                  <div class="form-check">{{ formset.empty_form.is_registered }}<label class="form-check-label" for="{{ formset.empty_form.is_registered.id_for_label }}">Registered</label></div>
+                  <div class="form-check">{{ formset.empty_form.is_paid }}<label class="form-check-label" for="{{ formset.empty_form.is_paid.id_for_label }}">Paid</label></div>
+                  <div class="form-check">{{ formset.empty_form.rosters_entered }}<label class="form-check-label" for="{{ formset.empty_form.rosters_entered.id_for_label }}">Rosters entered</label></div>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2">
+                  <div class="form-label">Hotel status</div>
+                  <div class="form-check">{{ formset.empty_form.hotel_compliant }}<label class="form-check-label" for="{{ formset.empty_form.hotel_compliant.id_for_label }}">Compliant</label></div>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2"><label class="form-label" for="{{ formset.empty_form.number_of_rooms_required.id_for_label }}">Number rooms req'd</label>{{ formset.empty_form.number_of_rooms_required }}</div>
+                <div class="col-12 col-md-8 col-lg-2">
                 <div class="form-label">Registration status</div>
                 <div class="btn-group" role="group" aria-label="Registration status for new team">
                   {% for choice in formset.empty_form.registration_status %}{{ choice.tag }}<label class="btn btn-sm btn-outline-secondary registration-status-{{ choice.data.value }}-toggle" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>{% endfor %}
                 </div>
               </div>
-              <div class="col-12 col-md-4 col-lg-1 d-flex align-items-end">
+                <div class="col-12 col-md-4 col-lg-1 d-flex align-self-end">
                 <span class="visually-hidden">{{ formset.empty_form.DELETE }}</span>
                 <button class="btn btn-sm btn-outline-danger" type="button" data-remove-registration title="Remove team" aria-label="Remove team">
                   <svg aria-hidden="true" fill="currentColor" height="16" viewBox="0 0 16 16" width="16"><path d="M5.5 5.5A.5.5 0 0 1 6 5h4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0V6H6v6.5a.5.5 0 0 1-1 0z"/><path d="M14.5 3a1 1 0 0 1-1 1H13l-.8 9.2A2 2 0 0 1 10.2 15H5.8a2 2 0 0 1-2-1.8L3 4h-.5a1 1 0 1 1 0-2h3a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1h3a1 1 0 0 1 1 1M4 4l.8 9.1a1 1 0 0 0 1 .9h4.4a1 1 0 0 0 1-.9L12 4zM6.5 2a.5.5 0 0 0-.5.5V3h4v-.5a.5.5 0 0 0-.5-.5z"/></svg>
@@ -157,6 +177,18 @@
         });
       }
 
+      function synchronizeRegistrationStatus(registrationForm) {
+        const isRegistered = registrationForm.querySelector('input[name$="-is_registered"]');
+        const notApplicable = registrationForm.querySelector('input[name$="-registration_status"][value="na"]');
+        const pending = registrationForm.querySelector('input[name$="-registration_status"][value="pending"]');
+
+        if (!isRegistered.checked) {
+          notApplicable.checked = true;
+        } else if (notApplicable.checked) {
+          pending.checked = true;
+        }
+      }
+
       document.getElementById("add-registration").addEventListener("click", () => {
         const formset = document.getElementById("registration-formset");
         const totalForms = document.getElementById("id_registrations-TOTAL_FORMS");
@@ -166,11 +198,15 @@
         formset.insertAdjacentHTML("beforeend", formMarkup);
         totalForms.value = Number(formIndex) + 1;
         synchronizeTeamOptions();
+        synchronizeRegistrationStatus(formset.lastElementChild);
       });
 
       registrationFormset.addEventListener("change", (event) => {
         if (event.target.matches('select[name$="-team"], input[name$="-DELETE"]')) {
           synchronizeTeamOptions();
+        }
+        if (event.target.matches('input[name$="-is_registered"]')) {
+          synchronizeRegistrationStatus(event.target.closest(".registration-form"));
         }
       });
 
@@ -184,6 +220,7 @@
       });
 
       synchronizeTeamOptions();
+      registrationFormset.querySelectorAll(".registration-form").forEach(synchronizeRegistrationStatus);
     </script>
   {% endif %}
 {% endblock %}

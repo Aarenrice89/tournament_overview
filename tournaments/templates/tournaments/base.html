@@ -19,17 +19,29 @@
       .status-paid { background: #C6EFCE; color: #084298; }
       .status-complete { background: #9FC5E8; color: #0f5132; }
       .registration-status { border-radius: 999px; font-size: .75rem; font-weight: 700; padding: .3rem .55rem; white-space: nowrap; }
+      .registration-status-na { background: #e9ecef; color: #495057; }
       .registration-status-pending { background: #fff3cd; color: #664d03; }
       .registration-status-accepted { background: #d1e7dd; color: #0f5132; }
-      .team-line { align-items: center; display: grid; gap: .35rem; grid-template-columns: minmax(8rem, 1fr) auto; margin-bottom: .3rem; }
+      .hotel-status { border-radius: 999px; font-size: .75rem; font-weight: 700; padding: .3rem .55rem; white-space: nowrap; }
+      .hotel-status-compliant { background: #d1e7dd; color: #0f5132; }
+      .hotel-status-not-compliant { background: #f8d7da; color: #842029; }
+      .tournament-results-table .tournament-column { width: 13rem; }
+      .tournament-results-table .dates-column { width: 10rem; }
+      .team-line { align-items: center; display: grid; gap: .35rem; grid-template-columns: minmax(8rem, 1fr) 7.75rem 7.5rem 6.25rem; margin-bottom: .3rem; }
+      .team-line-heading > span { align-content: center; min-height: 2.4em; }
+      .team-line-team { justify-self: start; text-align: left; }
+      .team-line-registration-status, .team-line-hotel-status { justify-self: center; text-align: center; }
+      .team-line-rooms-required { justify-self: end; text-align: right; }
       .team-line-heading { border-bottom: 1px solid #e9ecef; padding-bottom: .2rem; }
       .team-status-group-title { font-size: .95rem; }
       .team-status-group + .team-status-group { border-top: 1px solid #dee2e6; margin-top: .75rem; padding-top: .75rem; }
       .btn-check:checked + .registration-status-pending-toggle { background: #fff3cd; border-color: #ffecb5; color: #664d03; }
       .btn-check:checked + .registration-status-accepted-toggle { background: #d1e7dd; border-color: #badbcc; color: #0f5132; }
+      .btn-check:checked + .registration-status-na-toggle { background: #e9ecef; border-color: #dee2e6; color: #495057; }
       fieldset { background: #fff; border: 0; border-radius: .5rem; margin-bottom: 1.25rem; padding: 1.25rem; }
       legend { color: var(--navy); font-size: 1.05rem; font-weight: 700; padding: 0 .25rem; width: auto; }
       .form-check { padding-top: 2rem; }
+      .registration-form .form-check { padding-top: 0; }
       .required label::after { color: #b02a37; content: " *"; }
     </style>
   </head>
