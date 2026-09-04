@@ -36,6 +36,8 @@ class TournamentForm(BootstrapFormMixin, forms.ModelForm):
             "stay_to_play_notes",
             "coach_hotel",
             "hotel_location",
+            "hotel_open_date",
+            "hotel_close_date",
             "number_of_rooms",
             "cost_per_room",
             "coaches_notes",
@@ -49,6 +51,8 @@ class TournamentForm(BootstrapFormMixin, forms.ModelForm):
             "end_date": forms.DateInput(attrs={"type": "date"}),
             "registration_opens_date": forms.DateInput(attrs={"type": "date"}),
             "registration_closes_date": forms.DateInput(attrs={"type": "date"}),
+            "hotel_open_date": forms.DateInput(attrs={"type": "date"}),
+            "hotel_close_date": forms.DateInput(attrs={"type": "date"}),
             "cost_per_team": forms.NumberInput(attrs={"step": "0.01", "min": "0"}),
             "cost_per_room": forms.NumberInput(attrs={"step": "0.01", "min": "0"}),
         }
@@ -71,7 +75,15 @@ class TeamForm(BootstrapFormMixin, forms.ModelForm):
 class TournamentRegistrationForm(BootstrapFormMixin, forms.ModelForm):
     class Meta:
         model = TournamentRegistration
-        fields = ["team", "is_registered", "is_paid", "rosters_entered", "registration_status"]
+        fields = [
+            "team",
+            "is_registered",
+            "is_paid",
+            "rosters_entered",
+            "hotel_compliant",
+            "number_of_rooms_required",
+            "registration_status",
+        ]
         widgets = {
             "registration_status": forms.RadioSelect(attrs={"class": "btn-check"}),
         }
