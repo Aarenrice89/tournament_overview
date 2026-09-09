@@ -1,7 +1,7 @@
 {% extends "coaches/base.html" %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-  <div><h1 class="h2 mb-1">Additional Work</h1><p class="text-muted mb-0">{{ month|date:"F Y" }}</p></div>
+  <div><h1 class="h2 mb-1">Coach Payroll</h1><p class="text-muted mb-0">{{ month|date:"F Y" }}</p></div>
   {% if compensation_configured and not month_is_paid and not month_is_future and not month_is_uninitialized_past %}<a class="btn btn-primary" href="{% url 'coaches:work-add' %}">Add work</a>{% endif %}
 </div>
 {% if not compensation_configured %}

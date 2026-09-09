@@ -20,9 +20,11 @@
   const hourlyFields = document.getElementById('hourly-fields');
   const tournamentFields = document.getElementById('tournament-fields');
   const lessonFields = document.getElementById('lesson-fields');
+  const hoursWorked = document.getElementById('id_hours_worked');
+  const tournamentDays = document.getElementById('id_tournament_days');
   const saveWork = document.getElementById('save-work');
   const hourlyActivities = ['club_practice', 'academy', 'volley_tots', 'volley_jrs', 'camp_clinic', 'other'];
-  function updateFields() { const value = activity.value; hourlyFields.hidden = !hourlyActivities.includes(value); tournamentFields.hidden = value !== 'tournament'; lessonFields.hidden = value !== 'private_lesson'; saveWork.disabled = !value; }
+  function updateFields() { const value = activity.value; const isHourly = hourlyActivities.includes(value); const isTournament = value === 'tournament'; hourlyFields.hidden = !isHourly; hoursWorked.disabled = !isHourly; tournamentFields.hidden = !isTournament; tournamentDays.disabled = !isTournament; lessonFields.hidden = value !== 'private_lesson'; saveWork.disabled = !value; }
   activity.addEventListener('change', updateFields); updateFields();
   function renumberLessons() { let number = 1; document.querySelectorAll('.lesson-form').forEach((lesson) => { if (!lesson.hidden) { lesson.querySelector('.lesson-title').textContent = `Private Lesson ${number}`; number += 1; } }); }
   document.getElementById('add-lesson').addEventListener('click', () => { const total = document.getElementById('id_lessons-TOTAL_FORMS'); const index = total.value; const html = document.getElementById('lesson-empty-form').innerHTML.replaceAll('__prefix__', index); document.getElementById('lesson-forms').insertAdjacentHTML('beforeend', html); total.value = Number(index) + 1; renumberLessons(); });
