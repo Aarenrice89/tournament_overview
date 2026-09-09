@@ -117,7 +117,7 @@ class AdditionalWorkForm(BootstrapFormMixin, forms.ModelForm):
         widgets = {
             "work_date": forms.DateInput(attrs={"type": "date"}),
             "hours_worked": forms.NumberInput(attrs={"min": "0.5", "max": "12", "step": "0.5"}),
-            "tournament_days": forms.Select(choices=[(day, day) for day in range(1, 5)]),
+            "tournament_days": forms.Select(choices=[("", "Select days"), *[(day, day) for day in range(1, 5)]]),
             "notes": forms.Textarea(attrs={"rows": 4}),
         }
 

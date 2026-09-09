@@ -273,6 +273,28 @@ class CompensationTests(TestCase):
 
         self.assertEqual(response.status_code, 404)
 
+    def test_coach_can_submit_hourly_work_with_a_blank_tournament_length(self):
+        self.client.force_login(self.coach.user)
+        form = AdditionalWorkForm(coach=self.coach)
+
+        self.assertEqual(form.fields["tournament_days"].widget.choices[0], ("", "Select days"))
+
+        response = self.client.post(
+            reverse("coaches:work-add"),
+            {
+                "activity": AdditionalWork.Activity.ACADEMY,
+                "work_date": central_today().isoformat(),
+                "hours_worked": "2.5",
+                "tournament_days": "",
+                "notes": "Practice",
+            },
+        )
+
+        work = AdditionalWork.objects.get(activity=AdditionalWork.Activity.ACADEMY)
+        self.assertRedirects(response, reverse("coaches:work-detail", kwargs={"pk": work.pk}))
+        self.assertEqual(work.hours_worked, Decimal("2.5"))
+        self.assertIsNone(work.tournament_days)
+
     def test_coach_can_submit_multiple_private_lessons(self):
         self.client.force_login(self.coach.user)
 
